@@ -3,7 +3,7 @@ import keyboard
 import time
 import os
 
-# --- MODULE IMPORTS ---
+# MY MODULES IMPORTS
 from config import *
 from core.environment import GeometryDashEnv
 from agents.ddqn import Agent
@@ -13,20 +13,20 @@ from curriculum.manager import CurriculumManager
 
 class GDAgentOrchestrator:
     def __init__(self):
-        # ================= ENV =================
+        # ENV
         self.env = GeometryDashEnv()
         self.env.frame_skip = 4
         self.env.frame_stack = 2
 
-        # ================= CURRICULUM =================
+        # CURRICULUM
         self.manager = CurriculumManager()
         self.current_slice = self.manager.get_current_slice()
         self.env.set_slice(self.current_slice)
 
-        # ================= MEMORY =================
+        # MEMORY
         self.memory = ReplayBuffer(MEMORY_SIZE)
 
-        # ================= AGENT =================
+        # AGENT
         agent_config = {
             'device': DEVICE,
             'lr': LR,
@@ -39,17 +39,14 @@ class GDAgentOrchestrator:
         }
         self.agent = Agent(INPUT_DIM, OUTPUT_DIM, agent_config, CHECKPOINT_DIR)
 
-        # ================= EXPERTS =================
+        # EXPERTS
         self.final_models_dir = os.path.join(CHECKPOINT_DIR, "final_models")
         self.experts_cache = self._load_experts_to_ram()
 
-        # ================= RELAY =================
+        # RELAY
         self._bridge_to_training_zone()
-
-    # ============================================================
+        
     # CURRICULUM ACCESS (ROBUST)
-    # ============================================================
-
     def _get_all_slices(self):
         for attr in ['slices', '_slices', 'curriculum']:
             if hasattr(self.manager, attr):
@@ -71,10 +68,7 @@ class GDAgentOrchestrator:
         out.sort(key=lambda x: x['start'])
         return out
 
-    # ============================================================
     # EXPERT LOADING
-    # ============================================================
-
     def _load_experts_to_ram(self):
         cache = {}
         if not os.path.exists(self.final_models_dir):
@@ -92,10 +86,7 @@ class GDAgentOrchestrator:
                     print(f"   -> Failed loading {fname}: {e}")
         return cache
 
-    # ============================================================
     # RELAY BRIDGE
-    # ============================================================
-
     def _bridge_to_training_zone(self):
         sid = self.current_slice['id']
 
@@ -128,13 +119,13 @@ class GDAgentOrchestrator:
             active_expert = None
 
             while True:
-                # ---------- ACT ----------
+                # ACT
                 action = self.agent.select_action(obs, is_training=False)
                 obs, _, terminated, truncated, info = self.env.step(action)
 
                 current_pos = float(info.get("percent", 0.0))
 
-                # ---------- EXPERT SWITCH (AFTER STEP) ----------
+                # EXPERT SWITCH (AFTER STEP)
                 correct_expert = None
                 for s in slice_list:
                     if s['start'] <= current_pos < s['end']:
@@ -153,7 +144,7 @@ class GDAgentOrchestrator:
                     active_expert = correct_expert
                     print(f"[Relay] {current_pos:.1f}% → Expert {active_expert}")
 
-                # ---------- SUCCESS ----------
+                # SUCCESS
                 if current_pos >= target_percent:
                     keyboard.press('w')
                     time.sleep(0.15)
@@ -171,31 +162,28 @@ class GDAgentOrchestrator:
 
         return False
 
-    # ============================================================
     # MODE-AWARE POLICY INITIALIZATION
-    # ============================================================
-
     def _load_current_progress(self):
         sid = self.current_slice['id']
         path = os.path.join(CHECKPOINT_DIR, f"slice_{sid:02d}_current.pth")
 
-        # 1️⃣ Resume existing checkpoint
+        # Resume existing checkpoint
         if os.path.exists(path):
             self.agent.load(path)
             print(f"[System] Resumed Slice {sid}")
             return
 
-        # 2️⃣ Get all slices robustly
+        # Get all slices
         all_slices = self._get_all_slices()
 
-        # 3️⃣ Determine previous slice with SAME mode
+        # Determine previous slice with SAME mode
         prev_same_mode = None
         for s in reversed(all_slices):
             if s["id"] < sid and s["mode"] == self.current_slice["mode"]:
                 prev_same_mode = s
                 break
 
-        # 4️⃣ Initialize network
+        # Initialize network
         if prev_same_mode is None:
             print(
                 f"[System] Slice {sid}: new mode {self.current_slice['mode']} → fresh policy"
@@ -215,10 +203,7 @@ class GDAgentOrchestrator:
             )
             self.agent.epsilon = 0.5
 
-    # ============================================================
     # TRAINING LOOP
-    # ============================================================
-
     def train(self):
         print(
             f"\n[Training] Starting Slice {self.current_slice['id']} Mastery..."
@@ -254,7 +239,7 @@ class GDAgentOrchestrator:
                     info['percent'] >= self.current_slice['end'], 0
                 )
 
-                # --- Print including total reward ---
+                # Print including total reward
                 print(
                     f"Ep {episode:<4} | "
                     f"Win% {win_rate*100:>5.1f}% | "
@@ -284,10 +269,7 @@ class GDAgentOrchestrator:
                 filename=f"slice_{self.current_slice['id']:02d}_current.pth"
             )
 
-    # ============================================================
     # SAVE FINAL EXPERT
-    # ============================================================
-
     def _save_expert_final(self):
         sid = self.current_slice['id']
         os.makedirs(self.final_models_dir, exist_ok=True)
@@ -297,6 +279,4 @@ class GDAgentOrchestrator:
         torch.save(self.agent.online_net.state_dict(), path)
         print(f"[System] Expert {sid} Saved.")
 
-
-if __name__ == "__main__":
-    GDAgentOrchestrator().train()
+GDAgentOrchestrator().train()

@@ -6,7 +6,7 @@ Detailed explanation of reward functions for each physics mode.
 Overview
 --------
 
-Dense reward shaping is critical for learning in sparse-reward environments. I design separate reward functions for Cube and Ship modes, each exploiting mode-specific dynamics.
+Dense reward shaping is critical for learning in sparse-reward environments. We design separate reward functions for Cube and Ship modes, each exploiting mode-specific dynamics.
 
 **Core Insight**: Reward signal should guide exploration toward successful policies without over-constraining behavior.
 
@@ -128,45 +128,96 @@ The CubeExpert class provides mode-tailored rewards for Slices 1, 2, 3, 5, 6, 8.
 Ship Mode Expert
 ----------------
 
-For Slices 4, 9 (Ship physics):
+For Slices 4, 7 (Ship physics):
 
 .. code-block:: python
 
    class ShipExpert:
        """
-       Expert logic for Ship mode (stability-centric).
-       Focus: Vertical centering + smooth motion + progress.
+       Reward shaping for Ship (Stereo Madness).
+       Focus: survival, forward progress, vertical stability around Y=235.
+       Minimal bias, DDQN-safe.
        """
-       
+   
+       SHIP_CENTER_Y = 235.0  # <- TRUE vertical center for ship corridor
+   
        @staticmethod
-       def get_reward(state, action, prev_percent):
+       def get_reward(
+           state,
+           action,
+           prev_percent,
+           prev_dist_nearest_hazard=None,
+           reward_context=None
+       ):
+           if reward_context is None:
+               reward_context = {}
+   
+           # Tuned parameters (Ship-specific)
+           progress_scale = float(reward_context.get("progress_scale", 20.0))
+           step_penalty = float(reward_context.get("step_penalty", 0.0001))
+   
+           thrust_penalty = float(reward_context.get("thrust_penalty", 0.0003))
+           spam_thrust_penalty = float(reward_context.get("spam_thrust_penalty", 0.0005))
+   
+           vertical_stability_bonus = float(
+               reward_context.get("vertical_stability_bonus", 0.01)
+           )
+   
+           clearance_bonus = float(reward_context.get("clearance_bonus", 0.005))
+           hazard_proximity_threshold = float(
+               reward_context.get("hazard_proximity_threshold", 30.0)
+           )
+   
+           death_penalty = float(reward_context.get("death_penalty", 5.0))
+   
            reward = 0.0
-           
-           # 1. Survival Reward
-           reward += 0.05
-           
-           # 2. Progress Reward
-           delta = state.percent - prev_percent
-           if delta > 0:
-               reward += delta * 10.0
-           
-           # 3. Centering Reward
-           target_y = 235.0
-           dist_from_center = abs(state.player_y - target_y)
-           if dist_from_center < 15:
-               reward += 10 * (1 - dist_from_center / 50.0)
-           else:
-               reward -= 10 * (dist_from_center / 200.0)
-           
-           # 4. Instability Penalty
-           if abs(state.player_vel_y) > 3.20:
-               reward -= 2000  # Severe penalty for jerky motion
-           
-           # 5. Precision Bonus
-           if hasattr(state, "dy_nearest_hazard") and abs(state.dy_nearest_hazard) <= 30:
-               reward += 3
-           
+   
+           # Forward progress (MAIN SIGNAL)
+           progress_delta = state.percent - prev_percent
+           if progress_delta > 0:
+               reward += progress_delta * progress_scale
+   
+           # Small per-step penalty
+           reward -= step_penalty
+   
+           # Thrust efficiency penalty
+           prev_action = reward_context.get("prev_action", None)
+           if action != 0:
+               reward -= thrust_penalty
+               if prev_action == 1:
+                   reward -= spam_thrust_penalty
+   
+           # Vertical stability around Y=235 (TINY shaping)
+           if hasattr(state, "y"):
+               dy_center = state.y - ShipExpert.SHIP_CENTER_Y
+               # Smooth reward ∈ [0, vertical_stability_bonus]
+               reward += vertical_stability_bonus * max(
+                   0.0, 1.0 - abs(dy_center) / 80.0
+               )
+   
+           # Optional clearance shaping (very small)
+           if prev_dist_nearest_hazard is not None and hasattr(
+               state, "dist_nearest_hazard"
+           ):
+               if (
+                   state.dist_nearest_hazard > prev_dist_nearest_hazard
+                   and prev_dist_nearest_hazard < hazard_proximity_threshold
+               ):
+                   reward += clearance_bonus
+   
+           # Death penalty
+           if hasattr(state, "dead") and state.dead:
+               reward -= death_penalty
+   
+           # Safety clamp
+           reward = max(min(reward, 10.0), -10.0)
+   
            return reward
+   
+       @staticmethod
+       def should_reset_weights(prev_mode):
+           # Reset when switching from Cube -> Ship
+           return prev_mode == 0
 
 **Why Different from Cube?**
 
@@ -190,21 +241,40 @@ Comparison Example
    ├─ Progress (0% → 5%): +100
    ├─ 10 steps: -0.001
    ├─ 2 jumps: -0.001
-   └─ Total: ~-7 to 10
+   └─ Total: ~+99.98
    
    Ship Reward:
    ├─ Progress (30% → 35%): +50
    ├─ Survival: +0.05
    ├─ Centering (near corridor): +8
    ├─ Low velocity (stable): 0 (no penalty)
-   └─ Total: ~+5558.05 to 8600
+   └─ Total: ~+58.05
    
-   Different magnitudes reflect difficulty differences.
+   Both positive, but different magnitudes reflect difficulty differences.
 
 Reward Shaping Challenges
 --------------------------
 
-**Challenge 1: Sparse High-Magnitude Rewards**
+**Challenge 1: Scale Imbalance**
+
+Small coefficients (0.0001) vs large (20.0) can cause:
+- Numerical instability (underflow/overflow)
+- Difficult optimization (mixed scales)
+
+**Solution**: Normalize rewards at episode end.
+
+.. code-block:: python
+
+   episode_rewards = [r1, r2, r3, ...]  # Raw rewards
+   mean_reward = mean(episode_rewards)
+   std_reward = std(episode_rewards)
+   
+   normalized_rewards = [
+       (r - mean_reward) / (std_reward + 1e-8)
+       for r in episode_rewards
+   ]
+
+**Challenge 2: Sparse High-Magnitude Rewards**
 
 Progress bonus (e.g., +100 for 5% completion) can dominate learning.
 
@@ -218,15 +288,15 @@ Progress bonus (e.g., +100 for 5% completion) can dominate learning.
    
    # NOT: reward += state.percent * 2.0 (absolute progress, biased)
 
-**Challenge 2: Hyperparameter Sensitivity**
+**Challenge 3: Hyperparameter Sensitivity**
 
 Small tuning changes cause large performance swings:
 
 .. code-block:: text
 
-   progress_scale = 15.0: Converges in X episodes
-   progress_scale = 20.0: Converges in Y episodes (optimal)
-   progress_scale = 25.0: Converges in Z episodes
+   progress_scale = 15.0: Converges in 50 episodes
+   progress_scale = 20.0: Converges in 45 episodes (optimal)
+   progress_scale = 25.0: Converges in 50 episodes
    progress_scale = 10.0: Fails (explores inefficiently)
    progress_scale = 50.0: Fails (overestimates progress value)
 

@@ -1,0 +1,115 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+env.bak/
+venv.bak/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.env
+.env.local
+*.sublime-workspace
+*.sublime-project
+.project
+.pydevproject
+.settings/
+
+# PyTorch & ML
+*.pth
+*.pt
+*.ckpt
+checkpoint/
+checkpoints/
+*.tar
+*.tar.gz
+
+# Logs & Metrics
+logs/
+*.log
+*.csv
+runs/
+tensorboard/
+.tensorboard/
+
+# Data & Cache
+*.cache
+*.pkl
+*.pickle
+data/
+datasets/
+cache/
+
+# Sphinx Documentation
+docs/_build/
+docs/.doctrees/
+
+# Test Coverage
+.coverage
+.pytest_cache/
+htmlcov/
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.lnk
+Desktop.ini
+
+# Geometry Dash specific
+Geometry.Dash.v2.2074/
+geode/temp/
+geode/unzipped/
+geode/logs/
+
+# Local environment files
+.env.local
+.env.*.local
+config.local.py
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Node modules (if using any JS tools)
+node_modules/
+package-lock.json
+
+# Misc
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.hypothesis/
+.pytest_cache/

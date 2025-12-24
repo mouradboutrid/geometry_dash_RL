@@ -1,0 +1,74 @@
+[
+    {
+        "id": 1,
+        "start": 0.0,
+        "end": 10.0,
+        "mode": 0,
+        "target_w": 10.0,
+        "description": "Intro - Simple Cube jumps"
+    },
+    {
+        "id": 2,
+        "start": 10.0,
+        "end": 20.0,
+        "mode": 0,
+        "target_w": 20.0,
+        "description": "Pre-Triple Spike - Standard Cube"
+    },
+    {
+        "id": 3,
+        "start": 20.0,
+        "end": 31.0,
+        "mode": 0,
+        "target_w": 30.0,
+        "description": "The Triple Spike - High Precision Cube"
+    },
+    {
+        "id": 4,
+        "start": 30.0,
+        "end": 47.0,
+        "mode": 1,
+        "target_w": 47.0,
+        "description": "First Ship Section - Stability check"
+    },
+    {
+        "id": 5,
+        "start": 47.0,
+        "end": 58.0,
+        "mode": 0,
+        "target_w": 58.0,
+        "description": "Mid Level Cube - Rhythm sections"
+    },
+    {
+        "id": 6,
+        "start": 58.0,
+        "end": 68.0,
+        "mode": 0,
+        "target_w": 68.0,
+        "description": "Mid Level Cube II - Transitions"
+    },
+    {
+        "id": 7,
+        "start": 68.0,
+        "end": 77.0,
+        "mode": 0,
+        "target_w": 77.0,
+        "description": "Pre-Final Cube"
+    },
+    {
+        "id": 8,
+        "start": 77.0,
+        "end": 86.0,
+        "mode": 0,
+        "target_w": 86.0,
+        "description": "Clutterfunk section - Complex jumps"
+    },
+    {
+        "id": 9,
+        "start": 86.0,
+        "end": 97.0,
+        "mode": 1,
+        "target_w": 97.0,
+        "description": "Final Ship - Victory Lap"
+    }
+]

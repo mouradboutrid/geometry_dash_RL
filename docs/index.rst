@@ -128,16 +128,16 @@ Performance Highlights
      - Value
    * - Algorithm
      - Sample Efficiency
-     - 95%+ action optimality
+     - 75%+ action optimality
    * - Training
      - Time to Completion
-     - 18-24 hours (RTX 3080)
+     - 24-30 hours (CPU Intel i5)
    * - Inference
      - Network Latency
      - 3-5 ms per decision
    * - Generalization
      - Success Rate
-     - 71-95% per slice
+     - 70% per slice
    * - Memory
      - Replay Buffer
      - 50K transitions

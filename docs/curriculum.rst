@@ -8,16 +8,16 @@ Motivation: Why Curriculum Learning?
 
 **Problem: Sparse Rewards & Long Horizons**
 
-Stereo Madness requires 200-300 correct sequential actions to complete. Standard RL:
+Stereo Madness requires 90-150 correct sequential actions to complete. Standard RL:
 
 .. code-block:: text
 
-   Naive RL Agent:
-   Episode 1: Dies at 5% → Reward: 0
+   Naive RL Agent: (counting only finishing lvl reward)
+   Episode 1: Dies at 5% → Reward: 0 
    Episode 2: Dies at 3% → Reward: 0
    Episode 3: Dies at 8% → Reward: 0
    ...
-   Episode 10000: Completes at 100% → Reward: ???
+   Episode X: Completes at 100% → Reward: ???
    
    Problem: Agent receives NO signal for intermediate progress
    Result: Exploration strategy fails; impossible to find 100% completion
@@ -27,14 +27,14 @@ Stereo Madness requires 200-300 correct sequential actions to complete. Standard
 .. code-block:: text
 
    Curriculum Agent (Slice 1 of 8):
-   Episode 1: Dies at 9% (SLICE TARGET: 10%) → Reward: +9.0 (progress)
-   Episode 2: Dies at 7% → Reward: +7.0
-   Episode 3: Completes 10% → Reward: +10.0 (SUCCESS!)
+   Episode 1: Dies at 9% (SLICE TARGET: 10%) → Reward: (progress) 
+   Episode 2: Dies at 7% → Reward: (progress)
+   Episode 3: Completes 10% → Reward: (progress) + (Absr state ==> huge reward) (SUCCESS!)
    ...
-   Episode 8: Success rate = 75% → PROMOTE TO SLICE 2
+   Episode 8: Success rate = 70% → PROMOTE TO SLICE 2 
    
    Slice 2 (Target: 10-20%):
-   Episode 1: Dies at 15% → Reward: +(15-10)=5.0
+   Episode 1: Dies at 15% → Reward: +((15-10)=progress)*Coeff
    ...
    
    Benefit: Dense rewards at each stage guide exploration
@@ -43,29 +43,74 @@ Stereo Madness requires 200-300 correct sequential actions to complete. Standard
 Slice Decomposition
 -------------------
 
-"Stereo Madness" is divided into 8 slices based on geometric level sections and physics mode.
+"Stereo Madness" is divided into 9 slices based on geometric level sections and physics mode.
 
 **Complete Slice Definitions** (from slice_definitions.json)
 
-+--------+-------+-------+-------+-------------------------------------------------------------+
-| Slice  | Start | End   | Mode  | Description                                                 |
-+========+=======+=======+=======+=============================================================+
-| 1      | 0%    | 10%   | Cube  | Intro - Simple jumps, basic obstacle avoidance              |
-+--------+-------+-------+-------+-------------------------------------------------------------+
-| 2      | 10%   | 20%   | Cube  | Pre-Triple Spike - Standard cube jumps, increased spacing   |
-+--------+-------+-------+-------+-------------------------------------------------------------+
-| 3      | 20%   | 31%   | Cube  | **Triple Spike** - High precision required, crowded section |
-+--------+-------+-------+-------+-------------------------------------------------------------+
-| 4      | 30%   | 47%   | Ship  | First Ship Section - Stability & centering focus            |
-+--------+-------+-------+-------+-------------------------------------------------------------+
-| 5      | 47%   | 58%   | Cube  | Mid Level Cube - Rhythm sections, precise timing             |
-+--------+-------+-------+-------+-------------------------------------------------------------+
-| 6      | 58%   | 68%   | Cube  | Mid Level Cube II - Transitions between obstacles            |
-+--------+-------+-------+-------+-------------------------------------------------------------+
-| 7      | 68%   | 80%   | Ship  | Second Ship Section - Higher speed, tighter sections         |
-+--------+-------+-------+-------+-------------------------------------------------------------+
-| 8      | 80%   | 100%  | Cube  | Final Stretch - Endurance test, varied obstacles             |
-+--------+-------+-------+-------+-------------------------------------------------------------+
+.. list-table:: Level Curriculum Slices
+   :widths: 7 10 10 12 11 50
+   :header-rows: 1
+
+   * - ID
+     - Start
+     - End
+     - Target W
+     - Mode
+     - Description
+   * - 1
+     - 0.0
+     - 10.0
+     - 10.0
+     - Cube
+     - Intro - Simple Cube jumps
+   * - 2
+     - 10.0
+     - 20.0
+     - 20.0
+     - Cube
+     - Pre-Triple Spike - Standard Cube
+   * - 3
+     - 20.0
+     - 31.0
+     - 30.0
+     - Cube
+     - The Triple Spike - High Precision Cube
+   * - 4
+     - 30.0
+     - 47.0
+     - 47.0
+     - Ship
+     - First Ship Section - Stability check
+   * - 5
+     - 47.0
+     - 58.0
+     - 58.0
+     - Cube
+     - Mid Level Cube - Rhythm sections
+   * - 6
+     - 58.0
+     - 68.0
+     - 68.0
+     - Cube
+     - Mid Level Cube II - Transitions
+   * - 7
+     - 68.0
+     - 77.0
+     - 77.0
+     - Cube
+     - Pre-Final Cube
+   * - 8
+     - 77.0
+     - 86.0
+     - 86.0
+     - Cube
+     - Clutterfunk section - Complex jumps
+   * - 9
+     - 86.0
+     - 97.0
+     - 97.0
+     - Ship
+     - Final Ship - Victory Lap
 
 **Physics Modes**
 
@@ -97,7 +142,7 @@ Progression Criteria
 
 Agent advances to next slice when:
 
-1. **Minimum Episodes**: ≥ 20 episodes completed on current slice
+1. **Minimum Episodes**: ≥ 700 episodes completed on current slice
 2. **Success Rate**: ≥ 70% success over rolling 50-episode window
 
 .. code-block:: python
@@ -119,7 +164,7 @@ Agent advances to next slice when:
    - Accounts for training variance
    
    70% Threshold:
-   - Not "perfect mastery" (95%+), allowing agent to learn on-the-fly in next slice
+   - Not "perfect mastery" (95%+), allowing agent to learn on-the-fly in next slice (Faster training)
    - Ensures sufficient skill before tackling harder content
    - Empirically found optimal; lower → too much retry; higher → too conservative
    
@@ -286,12 +331,12 @@ If relay fails (dies before checkpoint):
 **Empirical Success Rate**
 
 Relay successfully navigates in:
-- Slice 2 relay: 99%+ success (Slice 1 expert very strong)
-- Slice 3 relay: 95%+ success (2 experts in sequence)
-- Slice 4 relay: 90%+ success (mode switch adds difficulty)
-- Slice 5+ relay: 85-95% success (multi-expert coordination)
+- Slice 2 relay: 85%+ success (Slice 1 expert very strong)
+- Slice 3 relay: 80%+ success (2 experts in sequence)
+- Slice 4 relay: 70%+ success (mode switch adds difficulty)
+- Slice 5+ relay: 70% success (multi-expert coordination)
 
-Takes ~30 seconds per successful relay (vs. 10+ minutes manual navigation).
+Takes ~0 seconds per successful (checkpoint in practice mod navigate only one time) relay (vs. 30+s manual navigation).
 
 Mode Transitions
 ----------------
@@ -357,7 +402,7 @@ Is the progression difficulty balanced?
 
    Episodes to 70% (empirical):
    
-   Slice 1: 8 episodes    ▯ (easy intro)
+   Slice 1: 8 episodes    ▯▯ (easy intro)
    Slice 2: 22 episodes   ▯▯▯ (moderate step)
    Slice 3: 45 episodes   ▯▯▯▯▯▯▯ (triple spike hard!)
    Slice 4: 38 episodes   ▯▯▯▯▯▯▯ (mode switch; hard)
@@ -368,7 +413,7 @@ Is the progression difficulty balanced?
    
    Total: 270 episodes ≈ 18-24 hours
 
-Could we improve by reordering slices? Analysis:
+Could it improved by reordering slices? Analysis:
 
 - **Can't move Slice 4 earlier** (depends on Cube expertise from 1-3)
 - **Can't split Triple Spike (Slice 3)** (it's geometrically contiguous)

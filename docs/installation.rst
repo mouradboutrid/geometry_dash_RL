@@ -9,9 +9,9 @@ Prerequisites
 **System Requirements:**
 
 - **OS**: Windows 10/11 (64-bit)
-- **GPU**: NVIDIA GPU with CUDA compute capability 5.2+ (recommended; CPU fallback supported)
+- **GPU**: NVIDIA GPU with CUDA (recommended) or **CPU** 
 - **RAM**: 8GB minimum (16GB recommended)
-- **Disk Space**: 2GB free for checkpoints and logs
+- **Disk Space**: 4GB free for checkpoints and logs and the GEODE mod
 
 **Software Requirements:**
 
@@ -33,7 +33,7 @@ Step 1: Install Geometry Dash & Geode
 
 2. **Download Geode Loader**
 
-   Visit: https://github.com/geode-sdk/geode/releases
+   Visit: https://geode-sdk.org/
 
    Download: ``geode-installer-v4.10.0-win.exe``
 
@@ -123,7 +123,7 @@ For RTX 30/40 series (CUDA 11.8):
 
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
-For CPU-only (slower):
+For CPU-only:
 
 .. code-block:: powershell
 
@@ -160,7 +160,7 @@ Step 4: Configuration
 
 **4.1: Verify shared memory parameters**
 
-Edit ``config.py``:
+Edit ``Stereo_Madness/config.py``:
 
 .. code-block:: python
 
@@ -234,16 +234,16 @@ Step 5: Verification & Testing
 
 Before starting training, ensure:
 
-- [ ] Geometry Dash v2.2074 installed
-- [ ] Geode mod loader running (icon visible)
-- [ ] utridu mod enabled (visible in mod list)
-- [ ] Python venv activated
-- [ ] PyTorch installed with CUDA support
-- [ ] All dependencies installed: ``pip list | grep -E "torch|gymnasium|numpy|keyboard"``
-- [ ] Shared memory struct size matches (1024 bytes)
-- [ ] config.py hyperparameters reviewed
-- [ ] Checkpoints directory exists: ``checkpoints/``
-- [ ] Logs directory exists: ``logs/``
+- Geometry Dash v2.2074 installed
+- Geode mod loader running (icon visible)
+- utridu mod enabled (visible in mod list)
+- Python venv activated
+- PyTorch installed with CUDA support
+- All dependencies installed: ``pip list | grep -E "torch|gymnasium|numpy|keyboard"``
+- Shared memory struct size matches (1024 bytes)
+- config.py hyperparameters reviewed
+- Checkpoints directory exists: ``checkpoints/``
+- Logs directory exists: ``logs/``
 
 **5.3: Launch training**
 
@@ -260,8 +260,8 @@ You should see output like:
    [System] Loading All Expert Models into RAM...
    [Curriculum] Starting fresh from Slice 1: Intro - Simple Cube jumps
    [Training] Starting Slice 1 Mastery...
-   Ep 1    | Win% 5.1%   | % 12.5  | Reward 45.23  | Loss 0.0234
-   Ep 2    | Win% 10.2%  | % 18.3  | Reward 38.12  | Loss 0.0189
+   Ep 1    | Win% -%   | % - | Reward -  | Loss -
+   Ep 2    | Win% -%  | % -  | Reward -  | Loss -
    ...
 
 Troubleshooting
@@ -269,40 +269,35 @@ Troubleshooting
 
 **"Could not find Shared Memory 'GD_RL_Memory'"**
 
-- [ ] Verify Geometry Dash is running
-- [ ] Verify utridu mod is enabled
-- [ ] Load a level (menu doesn't initialize memory)
-- [ ] Press 'M' in-game to toggle HUD; should display memory status
+- Verify Geometry Dash is running
+- Verify utridu mod is enabled
+- Load a level (menu doesn't initialize memory)
+- Press 'M' in-game to toggle HUD; should display memory status (If activated else the HUD WILL BE SHOWN ANYWAY)
 
 **"ERR: CreateFile Failed! (Run Admin)"**
 
-- [ ] Right-click Geometry Dash → Run as Administrator
-- [ ] Or: Whitelist in antivirus software
-
-**"CUDA out of memory"**
-
-- [ ] Reduce BATCH_SIZE in config.py (default: 64 → try 32)
-- [ ] Reduce MEMORY_SIZE (default: 50000 → try 20000)
-- [ ] Switch to CPU: Set DEVICE = torch.device("cpu")
+- Right-click Geometry Dash → Run as Administrator
+- Or: Whitelist in antivirus software
 
 **"Low FPS in game during training"**
 
-- [ ] Normal behavior during inference (~15ms latency per frame)
-- [ ] Reduce frame_skip value in main.py (tradeoff: slower learning)
-- [ ] Upgrade GPU or switch to CPU (much slower training)
+- Normal behavior during inference (~15ms latency per frame)
+- Reduce frame_skip value in main.py (tradeoff: slower learning)
+- Upgrade GPU or switch to CPU (much slower training)
+- Modify the graphic settings inside the game :)
 
 **"Agent not learning; losses not decreasing"**
 
-- [ ] Check reward shapes in expert_cube.py / expert_ship.py
-- [ ] Verify input normalization in state_utils.py (check for NaN propagation)
-- [ ] Reduce learning rate (LR = 0.0001)
-- [ ] Increase batch size for more stable gradients (BATCH_SIZE = 128)
+- Check reward shapes in expert_cube.py / expert_ship.py
+- Verify input normalization in state_utils.py (check for NaN propagation)
+- Reduce learning rate (LR = 0.0001)
+- Increase batch size for more stable gradients (BATCH_SIZE = 128)
 
 **"Training crashes with 'stuck level' error**
 
-- [ ] Verify level auto-checkpoint disabled (should be in init)
-- [ ] Check C++ stuck-frame detection threshold (default: 30 frames / 0.5s)
-- [ ] Ensure no manual pause during training
+- Verify level auto-checkpoint disabled (should be in init)
+- Check C++ stuck-frame detection threshold (default: 30 frames / 0.5s)
+- Ensure no manual pause during training
 
 Environment Variables
 ---------------------

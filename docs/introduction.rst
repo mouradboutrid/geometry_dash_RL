@@ -118,9 +118,8 @@ Upon successful training:
 
 - **Slice 1-3**: Agent masters cube platforming (0-31% completion)
 - **Slice 4**: Agent learns ship stability mechanics (30-47%)
-- **Slice 5-6**: Agent refines intermediate cube timing (47-68%)
-- **Slice 7**: Agent masters second ship section (68-80%)
-- **Slice 8**: Agent completes final cube sprint (80-100%)
+- **Slice 5-6-7,8**: Agent refines cube timing and start mastering (47-86%)
+- **Slice 9**: Agent masters second ship section (86-96%)
 
 Overall success rate: **70%** across random initializations and stochastic training seeds.
 

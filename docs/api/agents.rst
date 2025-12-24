@@ -8,11 +8,6 @@ Complete API documentation for agent modules.
 Agent (DDQN)
 ------------
 
-.. automodule:: agents.ddqn
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 The ``Agent`` class implements Dueling Double Q-Learning with the following key methods:
 
 .. py:class:: Agent(input_dim, output_dim, config, checkpoint_dir)
@@ -42,8 +37,17 @@ The ``Agent`` class implements Dueling Double Q-Learning with the following key 
       :rtype: float
 
    .. py:method:: save(filename="best_model.pth")
+
+      Save trained model to checkpoint file.
+
    .. py:method:: load(path)
+
+      Load model weights from checkpoint file.
+
    .. py:method:: reset_network()
+
+      Reset all network weights.
+
 
 DuelingDQN Architecture
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -59,14 +63,10 @@ DuelingDQN Architecture
    - **FC2**: 256 → 256, ReLU
    - **Value stream**: 256 → 128 → 1
    - **Advantage stream**: 256 → 128 → 2
-   - **Output**: $Q(s,a) = V(s) + A(s,a) - \text{mean}(A(s,a))$
+   - **Output**: :math:`Q(s,a) = V(s) + A(s,a) - \text{mean}(A(s,a))`
 
 ReplayBuffer
 ------------
-
-.. automodule:: agents.replay_buffer
-   :members:
-   :undoc-members:
 
 .. py:class:: ReplayBuffer(capacity)
 
@@ -75,15 +75,22 @@ ReplayBuffer
    :param int capacity: Max transitions (default 50000)
 
    .. py:method:: push(state, action, reward, next_state, done)
+
+      Add experience tuple to buffer.
+
    .. py:method:: sample(batch_size)
+
+      Sample random batch of experiences from buffer.
+
    .. py:method:: __len__()
 
-Expert Modules
---------------
+      Return current buffer size.
 
-.. automodule:: agents.expert_cube
-   :members:
-   :undoc-members:
+Expert Modules
+---------------
+
+CubeExpert
+^^^^^^^^^^
 
 .. py:class:: CubeExpert
 
@@ -91,22 +98,24 @@ Expert Modules
 
    .. py:staticmethod:: get_reward(state, action, prev_percent, prev_dist_nearest_hazard=None, reward_context=None)
 
+      Compute reward for cube mode platforming.
+
       **Reward components:**
       
-      - **Progress**: $\Delta\% \times 20.0$
+      - **Progress**: :math:`\Delta\% \times 20.0`
       - **Step penalty**: -0.0001
       - **Jump penalty**: -0.0005
       - **Clearance bonus**: +0.01
       - **Landing bonus**: +20
 
-.. automodule:: agents.expert_ship
-   :members:
-   :undoc-members:
+
+ShipExpert
+^^^^^^^^^^
 
 .. py:class:: ShipExpert
 
    SOTA-aligned reward shaping for Ship mode (Stereo Madness). 
-   Focuses on survival, forward progress, and vertical stability around **Y=235**.
+   Focuses on survival, forward progress, and vertical stability around :math:`Y=235`.
 
    .. py:staticmethod:: get_reward(state, action, prev_percent, prev_dist_nearest_hazard=None, reward_context=None)
 
@@ -122,8 +131,8 @@ Expert Modules
 
       **Reward components:**
       
-      - **Progress (Main)**: $\Delta\% \times 20.0$
-      - **Stability**: Bonus up to +0.01 based on proximity to $Y=235$
+      - **Progress (Main)**: :math:`\Delta\% \times 20.0`
+      - **Stability**: Bonus up to +0.01 based on proximity to :math:`Y=235`
       - **Thrust Penalty**: -0.0003 per thrust action
       - **Spam Penalty**: -0.0005 if action is a repeated thrust
       - **Clearance**: +0.005 for moving away from hazards within 30 units

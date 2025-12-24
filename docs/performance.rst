@@ -6,35 +6,36 @@ Empirical training results, benchmarks, and analysis.
 Training Results Summary
 ------------------------
 
-**Complete Training Timeline** (RTX 3080 GPU)
+**Complete Training Timeline** (CPU) (The Time value is only an estimation because i didn't record the correct period)
 
 +--------+------------------+---------------------+-----------+---------------+
-| Slice  | Episodes to 70%  | Peak Success Rate   | Time      | Total Time    |
+| Slice  | Episodes to 70%  | Success Rate        | Time      | Total Time    |
 +========+==================+=====================+===========+===============+
-| 1      | 8                | 95%                 | 45 min    | 45 min        |
+| 1      | -                | 70%                 | 45 min    | 45 min        |
 +--------+------------------+---------------------+-----------+---------------+
-| 2      | 22               | 88%                 | 2.2 hrs   | 2.25 hrs      |
+| 2      | -                | 70%                 | 2.2 hrs   | 2.25 hrs      |
 +--------+------------------+---------------------+-----------+---------------+
-| 3      | 45               | 72%                 | 4.5 hrs   | 6.75 hrs      |
+| 3      | -                | 70%                 | 4.5 hrs   | 6.75 hrs      |
 +--------+------------------+---------------------+-----------+---------------+
-| 4      | 38               | 75%                 | 3.8 hrs   | 10.55 hrs     |
+| 4      | -                | 70%                 | 3.8 hrs   | 10.55 hrs     |
 +--------+------------------+---------------------+-----------+---------------+
-| 5      | 28               | 80%                 | 2.8 hrs   | 13.35 hrs     |
+| 5      | -                | 70%                 | 2.8 hrs   | 13.35 hrs     |
 +--------+------------------+---------------------+-----------+---------------+
-| 6      | 35               | 78%                 | 3.5 hrs   | 16.85 hrs     |
+| 6      | -                | 70%                 | 3.5 hrs   | 16.85 hrs     |
 +--------+------------------+---------------------+-----------+---------------+
-| 7      | 42               | 74%                 | 4.2 hrs   | 21.05 hrs     |
+| 7      | -                | 70%                 | 4.2 hrs   | 21.05 hrs     |
 +--------+------------------+---------------------+-----------+---------------+
-| 8      | 52               | 71%                 | 5.2 hrs   | **26.25 hrs** |
+| 8      | -                | 70%                 | 5.2 hrs   | **26.25 hrs** |
++--------+------------------+---------------------+-----------+---------------+
+| 9      | -                | 70%                 | 5 hrs     | **31.25 hrs** |
 +--------+------------------+---------------------+-----------+---------------+
 
 **Key Metrics**
 
-- **Total Episodes**: 270
-- **Total Training Time**: 18-26 hours wall-clock (depends on GPU utilization)
+- **Total Training Time**: 24,30 hours wall-clock
 - **Total Samples**: ~81,000 transitions (270 eps × 300 steps avg)
-- **Final Success Rate**: 71% (can complete entire level without failure)
-- **Failure Points**: Random (dies at different locations across runs)
+- **Final Success Rate**: 70% (can complete entire level without failure)
+- **Failure Points**: Random (dies at different locations across runs (Prevent that by increasing Sucsess rate but slow Convergence ...))
 
 Convergence Analysis
 --------------------
@@ -43,52 +44,52 @@ Convergence Analysis
 
 For representative slices:
 
-**Slice 1 (Easy)**
+**Slice 1 (Easy but first exploration)**
 
 .. code-block:: text
 
    Success Rate
-   100% |     ╱─╲  ╱╲
-   75%  |    ╱  ╲╱  ╲╱╲
-   50%  |   ╱
+   70%  |     ╱─╲  ╱╲
+   65%  |    ╱  ╲╱  ╲╱╲
+   40%  |   ╱
    25%  |  ╱
    0%   |_╱________________
-        0    5    10   15 episodes
+        0    200   400   600   800  episodes
    
    Pattern: Quick convergence, reaches 70% by episode 8
-   Noise: High (sparse samples in early episodes)
+   Convergence: Reaches 70% by episode 1100
 
 **Slice 3 (Triple Spike - Hard)**
 
 .. code-block:: text
 
    Success Rate
-   100% |                  ╱─
-   75%  |        ╱─╲╱─╲   ╱
-   50%  |       ╱    ╲ ╲ ╱
+   70%  |                  ╱─
+   65%  |        ╱─╲╱─╲   ╱
+   40%  |       ╱    ╲ ╲ ╱
    25%  |      ╱      ╲_╱
    0%   |_____╱____________
-        0    10   20   30   40   45 episodes
+        0    200   400   600   800  episodes
    
    Pattern: Slow improvement with plateaus
    Noise: High variance (triple spike punishes mistakes severely)
-   Convergence: Reaches 70% by episode 45
+   Convergence: Reaches 70% by episode -
 
 **Slice 4 (First Ship - Physics Reset)**
 
 .. code-block:: text
 
    Success Rate
-   100% |              ╱╱─
-   75%  |       ╱╱─╲  ╱╱
-   50%  |  ╱╱─╲╱    ╲╱
+    70% |              ╱╱─
+   65%  |       ╱╱─╲  ╱╱
+   40%  |  ╱╱─╲╱    ╲╱
    25%  | ╱
    0%   |________________
-        0    10   20   30  38 episodes
+        0    200   400   600   800  episodes
    
    Pattern: Initial exploration penalty (physics reset)
    Recovery: By episode 15, learning rate improves
-   Convergence: Reaches 70% by episode 38
+   Convergence: Reaches 70% by episode -
 
 **Sample Efficiency**
 
@@ -279,7 +280,7 @@ Recommendation: 50000 is empirically optimal.
 
 Recommendation: 50K for balance of memory and stability.
 
-GPU vs CPU Performance
+GPU vs CPU Performance (I only test CPU)
 ----------------------
 
 **Inference Speed** (Forward Pass Only)
@@ -297,7 +298,7 @@ GPU vs CPU Performance
    - Total latency: ~175 ms ✗
    - Game frame budget: 16.67 ms (cannot keep up)
 
-Result: GPU required for real-time training; CPU fallback not practical.
+Result: GPU required for real-time training; CPU fallback not practical but it work.
 
 **Memory Usage**
 
@@ -329,7 +330,7 @@ For Slice 3 (Triple Spike) as representative:
 +------------------------+-----------+----------+---------------+
 | DQN (Standard)         | 65        | 6.5 hrs  | 68%           |
 +------------------------+-----------+----------+---------------+
-| **Double DQN** ✓        | **45**    | **4.5**  | **72%**       |
+| **Double DQN** ✓        | **45**   | **4.5**  | **72%**       |
 +------------------------+-----------+----------+---------------+
 | PPO                    | 55        | 5.5 hrs  | 70%           |
 +------------------------+-----------+----------+---------------+
@@ -346,30 +347,9 @@ For Slice 3 (Triple Spike) as representative:
 Scalability Analysis
 --------------------
 
-**Computational Complexity**
-
-.. code-block:: text
-
-   Per Training Step:
-   ├─ Network forward (batch 64):        5 ms
-   ├─ Network backward (gradient):       3 ms
-   ├─ Parameter update (Adam):           1 ms
-   └─ Total per step: 9 ms
-   
-   Per Episode:
-   ├─ 300 steps × 4 frame_skip:         ~45 sec game time
-   ├─ Training steps per episode:        10 steps → 90 ms
-   ├─ Memory I/O overhead:               ~5 ms
-   └─ Total: ~100 ms per episode
-   
-   Training 8 slices (270 episodes):
-   ├─ Game time: 270 × 45 sec = 202 min
-   ├─ Training overhead: 270 × 100 ms = 27 min
-   └─ Total: 229 min ≈ 3.8 hours (wall time 18-26 hrs due to GPU contention)
-
 **Scaling to Multiple Levels**
 
-If we wanted to train on 10 different Geometry Dash levels:
+If You wanted to train on 10 different Geometry Dash levels:
 
 .. code-block:: text
 
@@ -395,26 +375,26 @@ Failure Analysis
 
 .. code-block:: text
 
-   Early Training (Episodes 1-15):
+   Early Training:
    ├─ Dies at first spike: 40% of deaths
    ├─ Dies at spacing gap: 30% of deaths
    ├─ Falls due to bad timing: 30% of deaths
    └─ Why: Random actions; no structure
    
-   Mid Training (Episodes 16-35):
+   Mid Training:
    ├─ Dies at 2nd spike: 20% of deaths
    ├─ Dies at 3rd spike (triple): 50% of deaths
    ├─ Dies at spacing gap: 20% of deaths
    ├─ Dies at deco obstacles: 10% of deaths
    └─ Why: Agent learned first spike; stuck on second/third
    
-   Late Training (Episodes 36-45):
+   Late Training:
    ├─ Dies at 3rd spike only: 60% of deaths
    ├─ Dies at spacing gap: 25% of deaths
    ├─ Dies at rare patterns: 15% of deaths
    └─ Why: Triple spike is hardest; agent learning precision
 
-**Learning Bottleneck**: Slice 3 (Triple Spike)
+**Learning Bottleneck**: Slice 3 (Triple Spike) 
 
 The three consecutive tight spikes require:
 1. Precise jump timing (±2 frames)
@@ -426,21 +406,19 @@ Random exploration finds correct patterns rarely; curriculum + reward shaping es
 Ablation Study: Impact of Each Component
 -----------------------------------------
 
-**What if we removed each component?**
+**What if I removed each component?**
 
 .. code-block:: text
 
-   BASELINE (Full System): 8 slices in 270 episodes = 100%
+   BASELINE (Full System): 9 slices 
    
-   Removed Feature        | Episodes to Complete | Relative
-   ──────────────────────┼─────────────────────┼──────────
-   Without Curriculum    | Never (>1000)       | >400%
-   Without Double DQN    | ~380 episodes       | +140%
-   Without Dueling       | ~320 episodes       | +18%
-   Without Replay Buffer | ~400 episodes       | +48%
-   Without Transfer      | ~340 episodes       | +26%
-   Without Frame Stack   | ~290 episodes       | +7%
-   Without Frame Skip    | ~300 episodes       | +11%
+   Removed Feature       | Episodes to Complete  | Relative
+   ──────────────────────┼───────────────────────┼──────────
+   Without Curriculum    | Never (>20000 minimum)| >400%
+   Without Replay Buffer | ~- episodes           | +-%
+   Without Transfer      | ~- episodes           | +-%
+   Without Frame Stack   | ~- episodes           | +-%
+   Without Frame Skip    | ~- episodes           | +-%
 
 **Key Finding**: Curriculum is by far the most important factor (400% impact).
 

@@ -1,48 +1,86 @@
 class ShipExpert:
     """
-    Expert Logic for Ship Mode (Slice 4, 9).
-    Focus: Stability, Centering, Flow.
+    aligned reward shaping for Ship (Stereo Madness).
+    Focus: survival, forward progress, vertical stability around Y=235.
+    Minimal bias, DDQN-safe.
     """
-    
+
+    SHIP_CENTER_Y = 235.0  # <- TRUE vertical center for ship corridor
+
     @staticmethod
-    def get_reward(state, action, prev_percent):
+    def get_reward(
+        state,
+        action,
+        prev_percent,
+        prev_dist_nearest_hazard=None,
+        reward_context=None
+    ):
+        if reward_context is None:
+            reward_context = {}
+
+        # Tuned parameters (Ship-specific)
+        progress_scale = float(reward_context.get("progress_scale", 20.0))
+        step_penalty = float(reward_context.get("step_penalty", 0.0001))
+
+        thrust_penalty = float(reward_context.get("thrust_penalty", 0.0003))
+        spam_thrust_penalty = float(reward_context.get("spam_thrust_penalty", 0.0005))
+
+        vertical_stability_bonus = float(
+            reward_context.get("vertical_stability_bonus", 0.01)
+        )
+
+        clearance_bonus = float(reward_context.get("clearance_bonus", 0.005))
+        hazard_proximity_threshold = float(
+            reward_context.get("hazard_proximity_threshold", 30.0)
+        )
+
+        death_penalty = float(reward_context.get("death_penalty", 5.0))
+
         reward = 0.0
 
-        # Survival Reward
-        reward += 0.05  # small reward for staying alive
+        # Forward progress (MAIN SIGNAL)
+        progress_delta = state.percent - prev_percent
+        if progress_delta > 0:
+            reward += progress_delta * progress_scale
 
-        # Progress Reward
-        delta = state.percent - prev_percent
-        if delta > 0:
-            reward += delta * 10.0  # scaled heavily to encourage forward progress
+        # Small per-step penalty
+        reward -= step_penalty
 
-        # Centering / Safety Corridor Reward
-        target_y = 235.0
-        dist_from_center = abs(state.player_y - target_y)
-        if dist_from_center < 15:
-            reward += 10 * (1 - dist_from_center / 50.0)
-        else:
-            reward -= 10 * (dist_from_center / 200.0)
-        # Instability Penalty
-        if abs(state.player_vel_y) > 3.20:
-            reward -= 2000  # penalize jerky vertical motion
+        # Thrust efficiency penalty
+        prev_action = reward_context.get("prev_action", None)
+        if action != 0:
+            reward -= thrust_penalty
+            if prev_action == 1:
+                reward -= spam_thrust_penalty
 
-        # Precision Bonus near Obstacles
-        if hasattr(state, "dy_nearest_hazard"):
-            if abs(state.dy_nearest_hazard) <= 30:
-                reward += 3
+        # Vertical stability around Y=235 (TINY shaping)
+        if hasattr(state, "y"):
+            dy_center = state.y - ShipExpert.SHIP_CENTER_Y
+            # Smooth reward ∈ [0, vertical_stability_bonus]
+            reward += vertical_stability_bonus * max(
+                0.0, 1.0 - abs(dy_center) / 80.0
+            )
 
-        # Passed Obstacles / Blocks Bonus
-        if hasattr(state, "passed_obstacles"):
-            # Assuming 'passed_obstacles' increments every time a block/obstacle is passed
-            reward += state.passed_obstacles * 20
+        # Optional clearance shaping (very small)
+        if prev_dist_nearest_hazard is not None and hasattr(
+            state, "dist_nearest_hazard"
+        ):
+            if (
+                state.dist_nearest_hazard > prev_dist_nearest_hazard
+                and prev_dist_nearest_hazard < hazard_proximity_threshold
+            ):
+                reward += clearance_bonus
+
+        # Death penalty
+        if hasattr(state, "dead") and state.dead:
+            reward -= death_penalty
+
+        # Safety clamp
+        reward = max(min(reward, 10.0), -10.0)
 
         return reward
 
     @staticmethod
     def should_reset_weights(prev_mode):
-        """
-        Logic for switching INTO Ship mode.
-        Reset weights if switching from Cube (Mode 0).
-        """
+        # Reset when switching from Cube -> Ship
         return prev_mode == 0

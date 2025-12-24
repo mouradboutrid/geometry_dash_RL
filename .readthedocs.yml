@@ -10,13 +10,10 @@ build:
     - freeglut3-dev
 
 sphinx:
-  # Adjust this if your conf.py is also in the root
-  configuration: docs/conf.py 
-
-formats:
-  - pdf
+  configuration: docs/conf.py
+  # This tells Read the Docs that your .rst files are inside /docs
+  fail_on_warning: false
 
 python:
   install:
-    # Pointing to the requirements.txt in your main (root) folder
     - requirements: requirements.txt

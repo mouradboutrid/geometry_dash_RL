@@ -1,3 +1,6 @@
+[![Documentation](https://img.shields.io/badge/Docs-Read%20the%20Docs-brightgreen)](https://geometry-dash-rl.readthedocs.io/en/latest/)
+
+
 # Geometry Dash Reinforcement Learning Agent
 
 ## Summary

@@ -1,6 +1,6 @@
 version: 2
 
-# Define the operating system and Python version
+# Top-level OS and Python settings
 os: ubuntu-22.04
 python:
   version: "3.11"

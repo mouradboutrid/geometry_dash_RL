@@ -22,7 +22,7 @@ Real-time neural network inference adds ~4-5 ms per frame. Game runs at 60 FPS (
 
 - Occasional frame drops during training
 - Agent occasionally misses time-critical decisions
-- Performance ceiling: ~75% success (missed frames cause unavoidable failures)
+- Performance ceiling: ~70% success (missed frames cause unavoidable failures)
 
 **Mitigation Strategies**
 
@@ -74,7 +74,7 @@ Agent is specialized, not generalized. Development of other levels requires:
 2. Reward shaping tuning per mode
 3. Retraining from scratch or fine-tuning
 
-Estimated effort: 8-16 hours per new level (including manual design).
+Estimated effort: 8-16 hours per new level (including manual design). (without training ofcourse)
 
 **Mitigation**
 
@@ -167,8 +167,8 @@ Game engine is deterministic. Same input sequence always produces same output.
 
 **Evidence**
 
-If we add ±50 ms input lag:
-- Agent success rate: 50% → 15% (catastrophic failure)
+If I add ±50 ms input lag:
+- Agent success rate: 50% → X% <<50% (failure)
 - Shows heavy overfitting to precise timing
 
 **Mitigation**
@@ -201,7 +201,7 @@ Reward functions manually designed per mode. Poor hyperparameter choices lead to
 
 .. code-block:: python
 
-   # Example: What if we set jump_penalty too high?
+   # Example: What if you set jump_penalty too high?
    jump_penalty = 0.1  # Too high!
    
    # Agent learns: "Never jump!" (safer but useless)
@@ -315,11 +315,11 @@ Manual checkpoint saving (every 50 episodes). Risk of data loss if training cras
 .. code-block:: text
 
    Risk Timeline
-   ├─ Episode 30 (of 45): Save slice_03_current.pth
+   ├─ Episode 300 (of 345): Save slice_03_current.pth
    ├─ Episode 31-45: No checkpoints created
-   ├─ Episode 44: GPU driver crash
-   ├─ Result: Lose episodes 31-44; restart from episode 30
-   └─ Wasted time: ~45 min
+   ├─ Episode 44: CPU driver crash
+   ├─ Result: Lose episodes restart from episode 300
+   └─ Wasted time (For stereoMadness it not mush but for longer levels it became a problem)
 
 **Current Safeguards**
 
@@ -329,8 +329,8 @@ Manual checkpoint saving (every 50 episodes). Risk of data loss if training cras
 
 **Insufficient Because**
 
-- 50-episode intervals can lose ~40 min of work
-- GPU crashes without warning
+- 500-episode intervals can lose ~40 min of work
+- CPU crashes without warning
 - No rollback mechanism
 
 **Mitigation**
@@ -385,28 +385,5 @@ Not portable. Limits use to Windows systems with access to specific GD version.
    - Maintains compatibility as GD updates
 
 **Current Scope: Windows 10/11 + GD 2.2074 only.**
-
-Summary Table
--------------
-
-+------------------------+--------+--------+----------+
-| Limitation             | Sever  | Mitigation | Timeline |
-+========================+========+========+==========+
-| Inference Latency      | Low    | Model Pruning | 3-6 mo |
-+------------------------+--------+--------+----------+
-| Limited Generalization | Medium | Domain Adaptation | 6 mo |
-+------------------------+--------+--------+----------+
-| Mode-Switch Dips       | Low    | Mode-Aware Architecture | 6 mo |
-+------------------------+--------+--------+----------+
-| Deterministic Env      | Medium | Domain Randomization | 3 mo |
-+------------------------+--------+--------+----------+
-| Reward Shaping         | Medium | Inverse RL | 6-9 mo |
-+------------------------+--------+--------+----------+
-| Limited Exploration    | Low    | Curiosity-Driven | 3 mo |
-+------------------------+--------+--------+----------+
-| Checkpoint Management  | Low    | Auto-Checkpointing | 1 mo |
-+------------------------+--------+--------+----------+
-| System Compatibility   | Low    | Docker/Web Version | 6 mo |
-+------------------------+--------+--------+----------+
 
 Next: :doc:`../future_work` for planned improvements.

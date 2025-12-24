@@ -11,7 +11,6 @@ build:
 
 sphinx:
   configuration: docs/conf.py
-  # This tells Read the Docs that your .rst files are inside /docs
   fail_on_warning: false
 
 python:

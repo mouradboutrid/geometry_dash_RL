@@ -338,6 +338,18 @@ Relay successfully navigates in:
 
 Takes ~0 seconds per successful (checkpoint in practice mod navigate only one time) relay (vs. 30+s manual navigation).
 
+**Practice Mode Checkpoint Workflow**
+
+In practice, the relay race navigation is executed as follows:
+
+1. **Load Previous Models**: Before navigating to the training slice, all previously trained expert models are loaded into memory from cache.
+
+2. **Navigate Using Experts**: The agent switches between these preloaded expert models during navigation based on which slice section it's currently in. Each expert is optimized for its respective slice, enabling reliable progression through previously mastered content.
+
+3. **Checkpoint Creation**: Once the agent successfully reaches the target training slice (e.g., 47% for Slice 5), a checkpoint is created by pressing the 'w' key. This saves the game state at the exact starting point of the new training slice.
+
+This workflow eliminates manual navigation overhead and ensures consistent starting conditions across multiple training episodes. The relay race succeeds because expert models are highly specialized for their target sections, making them very effective navigators when applied in sequence.
+
 Mode Transitions
 ----------------
 

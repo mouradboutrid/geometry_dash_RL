@@ -9,8 +9,8 @@ def normalize_state(state):
     
     Output Shape: (154,)
     """
-    # 1. Player Physics (4 features)
-    # We assume standard GD physics ranges for normalization
+    # Player Physics (4 features)
+    # I assume standard GD physics ranges for normalization (Based on my runs in the game !)
     player_data = [
         state.player_vel_y / 30.0,   # Max Y vel is approx 20-30
         state.player_y / 900.0,      # Max height is approx 800-900
@@ -18,7 +18,7 @@ def normalize_state(state):
         float(state.player_mode)     # 0.0 (Cube) or 1.0 (Ship)
     ]
     
-    # 2. Object Data (30 objects * 5 features = 150 features)
+    # Object Data (30 objects * 5 features = 150 features)
     obj_features = []
     for i in range(30):
         obj = state.objects[i]

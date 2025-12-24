@@ -331,10 +331,10 @@ If relay fails (dies before checkpoint):
 **Empirical Success Rate**
 
 Relay successfully navigates in:
-- Slice 2 relay: 85%+ success (Slice 1 expert very strong)
-- Slice 3 relay: 80%+ success (2 experts in sequence)
-- Slice 4 relay: 70%+ success (mode switch adds difficulty)
-- Slice 5+ relay: 70% success (multi-expert coordination)
+* Slice 2 relay: 85%+ success (Slice 1 expert very strong)
+* Slice 3 relay: 80%+ success (2 experts in sequence)
+* Slice 4 relay: 70%+ success (mode switch adds difficulty)
+* Slice 5+ relay: 70% success (multi-expert coordination)
 
 Takes ~0 seconds per successful (checkpoint in practice mod navigate only one time) relay (vs. 30+s manual navigation).
 

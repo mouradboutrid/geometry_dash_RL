@@ -8,31 +8,31 @@ class ShipExpert:
     def get_reward(state, action, prev_percent):
         reward = 0.0
 
-        # --- 1. Survival Reward ---
+        # Survival Reward
         reward += 0.05  # small reward for staying alive
 
-        # --- 2. Progress Reward ---
+        # Progress Reward
         delta = state.percent - prev_percent
         if delta > 0:
             reward += delta * 10.0  # scaled heavily to encourage forward progress
 
-        # --- 3. Centering / Safety Corridor Reward ---
+        # Centering / Safety Corridor Reward
         target_y = 235.0
         dist_from_center = abs(state.player_y - target_y)
         if dist_from_center < 15:
             reward += 10 * (1 - dist_from_center / 50.0)
         else:
             reward -= 10 * (dist_from_center / 200.0)
-        # --- 4. Instability Penalty ---
+        # Instability Penalty
         if abs(state.player_vel_y) > 3.20:
             reward -= 2000  # penalize jerky vertical motion
 
-        # --- 5. Precision Bonus near Obstacles ---
+        # Precision Bonus near Obstacles
         if hasattr(state, "dy_nearest_hazard"):
             if abs(state.dy_nearest_hazard) <= 30:
                 reward += 3
 
-        # --- 6. Passed Obstacles / Blocks Bonus ---
+        # Passed Obstacles / Blocks Bonus
         if hasattr(state, "passed_obstacles"):
             # Assuming 'passed_obstacles' increments every time a block/obstacle is passed
             reward += state.passed_obstacles * 20

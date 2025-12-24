@@ -16,7 +16,7 @@ What is Geode?
 **Alternatives**:
 
 - Direct DLL injection: Risky, requires binary patching
-- Memory hacking via Cheat Engine: Slow, unreliable
+- Memory hacking via Cheat Engine: Slow, unreliable (I try it, It failed for portals, pads, and orbs, also for gravity and is_mini ...)
 - **Geode**: Safe, official, well-maintained ✓
 
 Geode provides:
@@ -29,7 +29,7 @@ Geode provides:
 
 This is Geode's hook syntax: inject code into existing classes at runtime.
 
-Our Mod: utridu
+My Mod: utridu
 ----------------
 
 **File**: ``geode/mods/utridu/src/main.cpp`` (430 lines)
@@ -61,7 +61,7 @@ Our Mod: utridu
        void keyDown(enumKeyCodes key);
        
        // Main loop: called every frame
-       void rl_loop(float dt);
+       void rl_loop(float dt); 
    };
 
 State Collection
@@ -332,11 +332,11 @@ The mod displays real-time HUD:
     2  | cube_portal    | 200 | 0   | 40 | 40
    ...
 
-Press 'M' to toggle HUD visibility.
+Press 'M' to toggle HUD visibility. () Only when activate it (If there is lagging in the training)
 
 Bounding boxes drawn for:
 - Player (white)
-- All visible objects (colored by type)
+- All visible objects (colored by type) 
 - RL-detected objects (thicker border)
 
 Building the Mod

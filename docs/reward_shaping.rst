@@ -19,7 +19,7 @@ The CubeExpert class provides mode-tailored rewards for Slices 1, 2, 3, 5, 6, 8.
 
    class CubeExpert:
        """
-       SOTA-aligned reward shaping for Cube jumping mechanics.
+       Reward shaping for Cube jumping mechanics.
        Focus: Forward progress + survival + precision.
        """
        
@@ -39,28 +39,28 @@ The CubeExpert class provides mode-tailored rewards for Slices 1, 2, 3, 5, 6, 8.
            
            reward = 0.0
            
-           # 1. Forward Progress (Main Signal)
+           # Forward Progress (Main Signal)
            progress_delta = state.percent - prev_percent
            if progress_delta > 0:
                reward += progress_delta * progress_scale
            
-           # 2. Per-Step Penalty (Anti-Idle)
+           # Per-Step Penalty (Anti-Idle)
            reward -= step_penalty
            
-           # 3. Jump Efficiency Penalty
+           # Jump Efficiency Penalty
            prev_action = reward_context.get("prev_action", None)
            if action != 0:  # Action 1 = holding/jumping
                reward -= jump_penalty
                if prev_action == 1:  # Consecutive jump
                    reward -= spam_jump_penalty
            
-           # 4. Hazard Clearance Bonus (Optional)
+           # Hazard Clearance Bonus (Optional)
            if prev_dist_nearest_hazard is not None and hasattr(state, "dist_nearest_hazard"):
                if (state.dist_nearest_hazard > prev_dist_nearest_hazard and 
                    prev_dist_nearest_hazard < hazard_proximity_threshold):
                    reward += clearance_bonus
            
-           # 5. Landing on Blocks (Strategic Jumps)
+           # Landing on Blocks (Strategic Jumps)
            if hasattr(state, "dy_block") and hasattr(state, "dy_player"):
                if state.dy_block > state.dy_player:  # Block higher than player
                    reward += landing_bonus
@@ -144,15 +144,15 @@ For Slices 4, 9 (Ship physics):
        def get_reward(state, action, prev_percent):
            reward = 0.0
            
-           # 1. Survival Reward
+           # Survival Reward
            reward += 0.05
            
-           # 2. Progress Reward
+           # Progress Reward
            delta = state.percent - prev_percent
            if delta > 0:
                reward += delta * 10.0
            
-           # 3. Centering Reward
+           # Centering Reward
            target_y = 235.0
            dist_from_center = abs(state.player_y - target_y)
            if dist_from_center < 15:
@@ -160,11 +160,11 @@ For Slices 4, 9 (Ship physics):
            else:
                reward -= 10 * (dist_from_center / 200.0)
            
-           # 4. Instability Penalty
+           # Instability Penalty
            if abs(state.player_vel_y) > 3.20:
                reward -= 2000  # Severe penalty for jerky motion
            
-           # 5. Precision Bonus
+           # Precision Bonus
            if hasattr(state, "dy_nearest_hazard") and abs(state.dy_nearest_hazard) <= 30:
                reward += 3
            
@@ -200,7 +200,7 @@ Comparison Example
    ├─ Survival: +0.05
    ├─ Centering (near corridor): +8
    ├─ Low velocity (stable): 0 (no penalty)
-   └─ Total: ~+5558.05 to 8600
+   └─ Total: ~+2.05 to 7
    
    Different magnitudes reflect difficulty differences.
 

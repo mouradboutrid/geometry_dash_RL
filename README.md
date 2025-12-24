@@ -566,10 +566,11 @@ Stereo_Madness/
 ## Contributing 
 
 **Key References**:
--Playing Geometry Dash with Convolutional Neural Networks, Stanford University 
+ 
 - Van Hasselt et al. (2015): "Deep Reinforcement Learning with Double Q-learning"
 - Wang et al. (2016): "Dueling Network Architectures for Deep Reinforcement Learning"
 - Curriculum Learning: Bengio et al. (2009), Graves et al. (2017)
+- Playing Geometry Dash with Convolutional Neural Networks, Stanford University
 
 
  ## Author

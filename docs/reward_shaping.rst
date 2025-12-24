@@ -19,7 +19,7 @@ The CubeExpert class provides mode-tailored rewards for Slices 1, 2, 3, 5, 6, 8.
 
    class CubeExpert:
        """
-       SOTA-aligned reward shaping for Cube jumping mechanics.
+       Reward shaping for Cube jumping mechanics.
        Focus: Forward progress + survival + precision.
        """
        
@@ -152,7 +152,7 @@ For Slices 4, 7 (Ship physics):
            if reward_context is None:
                reward_context = {}
    
-           # Tuned parameters (Ship-specific)
+           # Tuned parameters (Ship-specific(found via experimentation))
            progress_scale = float(reward_context.get("progress_scale", 20.0))
            step_penalty = float(reward_context.get("step_penalty", 0.0001))
    

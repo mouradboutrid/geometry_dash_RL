@@ -1,6 +1,6 @@
 # Geometry Dash Reinforcement Learning Agent
 
-## Executive Summary
+## Summary
 
 This project implements a deep reinforcement learning agent that learns to play Geometry Dash (v2.2074) through curriculum-based training with expertise specialization. The system integrates native C++ game hooking via the Geode modding framework with a sophisticated Python-based training pipeline, enabling the agent to master progressively complex level sections through dueling double Q-learning with mode-aware policy transfer.
 
@@ -48,16 +48,16 @@ Geometry Dash presents unique challenges for reinforcement learning:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      Python Training Loop                    │
-│                  (main.py / GDAgentOrchestrator)             │
+│                      Python Training Loop                   │
+│                  (main.py / GDAgentOrchestrator)            │
 └──────────────────────────┬──────────────────────────────────┘
                            │
                 ┌──────────┼──────────┐
                 │          │          │
-         ┌──────▼──┐  ┌───▼────┐  ┌─▼──────────┐
-         │  DDQN   │  │Replay  │  │Curriculum │
-         │ Agent   │  │Buffer  │  │Manager    │
-         └──────┬──┘  └───┬────┘  └─┬─────────┘
+         ┌──────▼──┐  ┌────▼───┐  ┌───▼────────┐
+         │  DDQN   │  │Replay  │  │ Curriculum │
+         │ Agent   │  │Buffer  │  │ Manager    │
+         └──────┬──┘  └───┬────┘  └─┬──────────┘
                 │         │         │
          ┌──────▼─────────▼─────────▼──────┐
          │  Shared Memory Interface        │
@@ -72,8 +72,8 @@ Geometry Dash presents unique challenges for reinforcement learning:
          └──────┬──────────────────────┘
                 │
          ┌──────▼──────────────────────┐
-         │  Geometry Dash Engine        │
-         │  (Cocos2D-based Game Loop)   │
+         │  Geometry Dash Engine       │
+         │  (Cocos2D-based Game Loop)  │
          └─────────────────────────────┘
 ```
 
@@ -100,7 +100,7 @@ Geometry Dash presents unique challenges for reinforcement learning:
 
 **`curriculum/manager.py`** - Curriculum Progression
 - Tracks 8 progressive slices of "Stereo Madness"
-- Implements promotion criteria (≥70% success rate over 50 episodes, minimum 20 episodes)
+- Implements promotion criteria (≥70% success rate over 50 episodes, minimum 700 episodes(for faster training else it can be expanded to 90, 95, 100%))
 - Maintains rolling success metrics and checkpoint recovery
 
 **`core/environment.py`** - Gymnasium Wrapper
@@ -292,7 +292,7 @@ Curriculum learning addresses **credit assignment and exploration challenges**:
 
 ### Slice Definitions
 
-"Stereo Madness" decomposed into 8 slices (see `curriculum/slice_definitions.json`):
+"Stereo Madness" decomposed into 9 slices (see `curriculum/slice_definitions.json`):
 
 ```
 Slice 1: 0-10%     | Cube     | Intro Jumps
@@ -301,18 +301,19 @@ Slice 3: 20-31%    | Cube     | Triple Spike (high precision)
 Slice 4: 30-47%    | Ship     | First Ship Section
 Slice 5: 47-58%    | Cube     | Mid Level Cube
 Slice 6: 58-68%    | Cube     | Mid Level Cube II
-Slice 7: 68-80%    | Ship     | Second Ship Section
-Slice 8: 80-100%   | Cube     | Final Stretch
+Slice 7: 68-77%    | Ship     | Second Ship Section
+Slice 8: 77-86%    | Cube     | Clutterfunk section - Complex jumps
+Slice 8: 86-100%   | ship     | Final Ship - Victory Lap
 ```
 
 ### Progression Criteria
 
 **Promotion Requirement**:
-- Minimum 20 episodes completed on current slice
+- Minimum 700 episodes completed on current slice
 - Success rate ≥ 70% over last 50 episodes
 
 **Rationale**: 
-- 20-episode minimum ensures statistical significance
+- 700-episode minimum ensures statistical significance
 - 70% threshold balances mastery (agent can handle most patterns) vs. exploration (continues learning corner cases)
 
 ### Policy Transfer Mechanism
@@ -352,7 +353,7 @@ This ensures training always starts from slice's natural starting point, avoidin
 
 ### Prerequisites
 
-- **Hardware**: GPU (NVIDIA with CUDA) recommended; CPU fallback supported
+- **Hardware**: GPU (NVIDIA with CUDA) recommended; CPU supported (all the result of the repo are result of cpu training (inter core i5))
 - **OS**: Windows 10/11 (Geometry Dash + Geode mod)
 - **Python**: 3.10+
 - **Geometry Dash**: v2.2074 with Geode loader installed
@@ -392,7 +393,7 @@ pip install gymnasium numpy keyboard
 1. Launch Geometry Dash
 2. Enable geode mod (mod loader icon → utridu → enable)
 3. Load "Stereo Madness" level
-4. Press 'M' to toggle HUD - should display "RL: Memory Ready"
+4. Press 'M' to toggle HUD - should display "RL: Memory Ready" (should be activated else it will be shown directly)
 
 #### 5. Start Training
 
@@ -403,8 +404,8 @@ python main.py
 
 Monitor training loop output:
 ```
-Ep 1    | Win% 5.1%   | % 12.5  | Reward 45.23  | Loss 0.0234
-Ep 2    | Win% 10.2%  | % 18.3  | Reward 38.12  | Loss 0.0189
+Ep 1    | Win% 5.1%   | % 5.1  | Reward -45.23  | Loss 23.984
+Ep 2    | Win% 10.2%  | % 8.3  | Reward -8.12   | Loss 17.768
 ...
 [Curriculum] Promoted to Slice 2: Pre-Triple Spike
 ```
@@ -415,16 +416,16 @@ Ep 2    | Win% 10.2%  | % 18.3  | Reward 38.12  | Loss 0.0189
 
 ### Benchmark Metrics
 
-| Slice | Physics | Episodes to 70% | Peak Success Rate | Avg Episode Steps |
-|-------|---------|-----------------|-------------------|-------------------|
-| 1 | Cube | 8 | 95% | 180 |
-| 2 | Cube | 22 | 88% | 450 |
-| 3 | Cube | 45 | 72% | 620 |
-| 4 | Ship | 38 | 75% | 3200 |
-| 5 | Cube | 28 | 80% | 2100 |
-| 6 | Cube | 35 | 78% | 2400 |
-| 7 | Ship | 42 | 74% | 3800 |
-| 8 | Cube | 52 | 71% | 4500 |
+| Slice | Physics | Episodes to 70% | Peak Success Rate | 
+|-------|---------|-----------------|-------------------|
+| 1 | Cube | 1100 | 70% |
+| 2 | Cube | 1300 | 70% |
+| 3 | Cube | 2000 | 70% |
+| 4 | Ship | 1000 | 70% |
+| 5 | Cube | 3000 | 70% |
+| 6 | Cube | - | 70% |
+| 7 | Ship | - | 70% |
+| 8 | Cube | 2000 | 70% |
 
 **Total Training Time**: ~18-24 hours on single GPU (RTX 3080)
 

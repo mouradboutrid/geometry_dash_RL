@@ -85,35 +85,11 @@ Raw values scaled to appropriate ranges before network input.
        
        return full_state
 
-**Normalization Rationale**:
-
-| Feature | Scale | Rationale |
-|---------|-------|-----------|
-| vel_y / 30 | [-1, 1] | Max upward/downward velocity |
-| player_y / 900 | [0, 1] | Level height bound |
-| is_on_ground | {0, 1} | Discrete flag |
-| player_mode | {0, 1} | Discrete mode |
-| dx / 1000 | [0, 1] | Visibility range (1000 px ahead) |
-| dy / 300 | [-1, 1] | Vertical range (±300 px) |
-| w, h / 50 | [0, 2] | Typical obstacle size |
-| type / 10 | [0, 1] | Arbitrary object type |
-
 **Why Normalize?**
 
-1. **Neural Network Stability**: Inputs in [0, 1] or [-1, 1] prevent exploding gradients
+1. **Neural Network Stability**: Prevent exploding gradients
 2. **Learning Speed**: Gradient magnitudes balanced across features
 3. **Generalization**: Normalized inputs reduce overfitting to specific ranges
-
-**Validation**:
-
-.. code-block:: python
-
-   # After normalization, check statistics
-   obs = normalize_state(raw_state)
-   print(f"Mean: {obs.mean():.4f}")     # Should be ~0
-   print(f"Std:  {obs.std():.4f}")      # Should be ~0.3-0.5
-   print(f"Min:  {obs.min():.4f}")      # Should be around -1
-   print(f"Max:  {obs.max():.4f}")      # Should be around +1
 
 Frame Stacking
 --------------
@@ -159,7 +135,7 @@ Observations are stacked (repeated) to provide temporal context.
    ├─ Resolution: Every frame decision (60 Hz)
    ├─ Latency: Network must respond in 16.7 ms
    ├─ Exploration: High-frequency updates
-   └─ Downside: Cannot keep up with GPU; training slow
+   └─ Downside: Cannot keep up with CPU; training slow
    
    Frame Skip = 4 (Current):
    ├─ Resolution: Every 67 ms decision
@@ -259,26 +235,6 @@ Additional features that could improve learning (not currently used):
 - Implicit knowledge of physics
 
 **Trade-off**: Increases input dimension (154 → 170+), slower training. Not justified currently; included for reference.
-
-State Statistics (Empirical)
-----------------------------
-
-From 1000 random frames during training:
-
-.. code-block:: text
-
-   Feature                    Mean        Std         Min         Max
-   ────────────────────────────────────────────────────────────────
-   vel_y / 30                  0.15       0.45       -0.98       0.98
-   player_y / 900              0.35       0.20        0.01       0.99
-   is_on_ground               0.62        0.49        0.00       1.00
-   player_mode                 0.38       0.48        0.00       1.00
-   ────────────────────────────────────────────────────────────────
-   object dx / 1000           0.40       0.35        0.00       0.99
-   object dy / 300            -0.02      0.45       -0.98       0.98
-   object w / 50              0.30       0.35        0.00       0.95
-   object h / 50              0.40       0.40        0.00       0.99
-   object type / 10           0.15       0.20        0.00       1.00
 
 **Insights**:
 - Velocity well-distributed (good feature coverage)

@@ -7,13 +7,12 @@ Geometry Dash Reinforcement Learning Agent
 .. image:: https://img.shields.io/badge/License-MIT-green.svg
 .. image:: https://img.shields.io/badge/Status-Active-brightgreen.svg
 
-A sophisticated deep reinforcement learning system that masters Geometry Dash through curriculum-based training with expertise specialization. The project integrates native C++ game hooking via the Geode modding framework with a PyTorch-based training pipeline.
+A sophisticated deep reinforcement learning system that learn to play Geometry Dash through curriculum-based training with expertise specialization. The project integrates native C++ game hooking via the Geode modding framework with a PyTorch-based training pipeline.
 
 **Quick Links:**
 
-- GitHub: https://github.com/yourusername/geometry_dash_RL
-- Paper: [Available upon request]
-- Discord: [Join our community]
+- GitHub: https://github.com/mouradboutrid/geometry_dash_RL
+- LinkedIn : https://ma.linkedin.com/in/mourad-boutrid-981659336
 
 .. toctree::
    :maxdepth: 2
@@ -79,13 +78,13 @@ This project addresses the challenge of training a reinforcement learning agent 
 - **Mode switching** (physics changes mid-level)
 - **Sparse rewards** (reward only on level completion)
 
-Our solution combines:
+My solution combines:
 
-✓ **Dueling Double Q-Learning**: Reduces overestimation bias in discrete action spaces
-✓ **Curriculum Learning**: Progressively harder subsections with dense rewards
-✓ **Cross-Language Synchronization**: Windows named pipes + spinlocks for C++/Python IPC
-✓ **Expert Caching**: Reuses learned knowledge across curriculum slices
-✓ **Mode-Aware Policy Transfer**: Specializes networks for Cube vs Ship physics
+* **Dueling Double Q-Learning**: Reduces overestimation bias in discrete action spaces
+* **Curriculum Learning**: Progressively harder subsections with dense rewards
+* **Cross-Language Synchronization**: Windows named pipes + spinlocks for C++/Python IPC
+* **Expert Caching**: Reuses learned knowledge across curriculum slices
+* **Mode-Aware Policy Transfer**: Specializes networks for Cube vs Ship physics
 
 Key Features
 ------------
@@ -120,28 +119,43 @@ Key Features
 Performance Highlights
 ----------------------
 
-| Component | Metric | Value |
-|-----------|--------|-------|
-| Algorithm | Sample Efficiency | 95%+ action optimality |
-| Training | Time to Completion | 18-24 hours (RTX 3080) |
-| Inference | Network Latency | 3-5 ms per decision |
-| Generalization | Success Rate | 71-95% per slice |
-| Memory | Replay Buffer | 50K transitions |
+.. list-table::
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - Component
+     - Metric
+     - Value
+   * - Algorithm
+     - Sample Efficiency
+     - 95%+ action optimality
+   * - Training
+     - Time to Completion
+     - 18-24 hours (RTX 3080)
+   * - Inference
+     - Network Latency
+     - 3-5 ms per decision
+   * - Generalization
+     - Success Rate
+     - 71-95% per slice
+   * - Memory
+     - Replay Buffer
+     - 50K transitions
 
 Project Status
 --------------
 
 - Full training pipeline for Stereo Madness
 - C++ Geode mod with real-time synchronization
-- Curriculum learning with 8 slices
+- Curriculum learning with 9 slices
 - Dual expert systems (Cube & Ship modes)
-- Multi-level extension in progress
-- Imitation learning bootstrapping planned
+- Multi-level extension in progress (Future work, it is not included in the REPO)
+- Imitation learning bootstrapping planned (Future Work)
 
 Requirements
 ------------
 
-- **Hardware**: GPU (NVIDIA CUDA) or CPU
+- **Hardware**: GPU (NVIDIA CUDA) or CPU (ALL the following result are CPU based training)
 - **OS**: Windows 10/11
 - **Python**: 3.10+
 - **Geometry Dash**: v2.2074 with Geode loader
@@ -176,15 +190,11 @@ Contributions are welcome! Please see :doc:`contributing` for guidelines.
 
    This project is actively maintained. For bug reports, feature requests, or questions, please open an issue on GitHub.
 
-License
--------
-
-MIT License. See LICENSE file for details.
 
 Cite This Work
 --------------
 
-If you use this project in research, please cite:
+If you use this project in research or study, please cite:
 
 .. code-block:: bibtex
 
@@ -192,5 +202,5 @@ If you use this project in research, please cite:
      title={Geometry Dash Reinforcement Learning Agent},
      author={Boutrid, Mourad},
      year={2025},
-     url={https://github.com/yourusername/geometry_dash_RL}
+     url={https://github.com/mouradboutrid/geometry_dash_RL}
    }

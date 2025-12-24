@@ -30,18 +30,6 @@ Getting Started
 Development Workflow
 --------------------
 
-**Before Coding**
-
-1. Check existing issues/PRs (avoid duplicates)
-2. Open issue describing proposed change
-3. Discuss design before implementation
-
-**Code Style**
-
-- **Python**: PEP 8 (use black formatter)
-- **C++**: Google C++ style guide
-- **Docstrings**: Google-style (see existing code)
-
 .. code-block:: bash
 
    # Format Python code
@@ -65,13 +53,6 @@ Development Workflow
 Format: ``[CATEGORY] Brief description``
 
 .. code-block:: text
-
-   Examples:
-   [FEAT] Add meta-learning training loop
-   [FIX] Correct spinlock timeout in MemoryBridge
-   [DOCS] Update algorithm section with references
-   [TEST] Add unit tests for ReplayBuffer
-   [REFACTOR] Simplify CurriculumManager initialization
 
 Contribution Areas
 -------------------

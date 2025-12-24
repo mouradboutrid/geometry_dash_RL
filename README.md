@@ -568,9 +568,10 @@ Stereo_Madness/
 - Wang et al. (2016): "Dueling Network Architectures for Deep Reinforcement Learning"
 - Curriculum Learning: Bengio et al. (2009), Graves et al. (2017)
 
- For questions, issues, or extensions, consult the source code documentation or contact me
 
  ## Author
+
+ **For questions, issues, or extensions, consult the source code documentation or contact me**
  
 **Mourad Boutrid**  
 [![Email](https://img.shields.io/badge/Email-D14836?logo=gmail&logoColor=white)](muurad.boutrid@gmail.com)

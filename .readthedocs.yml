@@ -1,17 +1,19 @@
 version: 2
 
-# Top-level OS and Python settings
+# Top-level OS
 os: ubuntu-22.04
+
+# Top-level Python
 python:
   version: "3.11"
   install:
     - requirements: requirements.txt
 
-# Lifecycle hooks for system-level commands
+# Top-level lifecycle hooks
 post_system_dependencies:
   - sudo apt-get update
   - sudo apt-get install -y some-package
 
-# Sphinx configuration (required)
+# Sphinx configuration (mandatory)
 sphinx:
   configuration: docs/conf.py

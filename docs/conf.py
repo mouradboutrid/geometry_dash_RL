@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 project = 'Geometry Dash RL Agent'
-copyright = '2025, GD-RL Development Team'
+copyright = '2025, GD_utridu'
 author = 'Mourad Boutrid'
 release = '1.0.0'
 

@@ -8,28 +8,28 @@ High-Level System Design
 
 .. code-block:: text
 
-   ┌───────────────────────────────────────────────────────────────────┐
-   │                 GEOMETRY DASH RL SYSTEM OVERVIEW                  │
-   └───────────────────────────────────────────────────────────────────┘
+   ┌─────────────────────────────────────────────────────────────────┐
+   │                 GEOMETRY DASH RL SYSTEM OVERVIEW                │
+   └─────────────────────────────────────────────────────────────────┘
    
    ┌─────────────────────────────────────────────────────────────────┐
    │                   PYTHON TRAINING LAYER                         │
    │  ┌────────────────────────────────────────────────────────────┐ │
-   │  │ GDAgentOrchestrator (main.py)                             │ │
-   │  │  - Episode loop management                                │ │
-   │  │  - Curriculum progression logic                           │ │
-   │  │  - Expert model caching & relay navigation               │ │
+   │  │ GDAgentOrchestrator (main.py)                              │ │
+   │  │  - Episode loop management                                 │ │
+   │  │  - Curriculum progression logic                            │ │
+   │  │  - Expert model caching & relay navigation                 │ │
    │  └────────────────────────────────────────────────────────────┘ │
-   │                              ↓↑                                   │
+   │                              ↓↑                                 │
    │  ┌────────────────────────────────────────────────────────────┐ │
-   │  │ Module Ecosystem                                          │ │
-   │  │  ┌──────────┬─────────────┬────────────┬──────────────┐  │ │
-   │  │  │  Agent   │ Environment │ Curriculum │ Replay       │  │ │
-   │  │  │  (DDQN)  │ (Gymnasium) │ (Manager)  │ Buffer       │  │ │
-   │  │  └──────────┴─────────────┴────────────┴──────────────┘  │ │
+   │  │ Module Ecosystem                                           │ │
+   │  │  ┌──────────┬─────────────┬────────────┬──────────────┐    │ │
+   │  │  │  Agent   │ Environment │ Curriculum │ Replay       │    │ │
+   │  │  │  (DDQN)  │ (Gymnasium) │ (Manager)  │ Buffer       │    │ │
+   │  │  └──────────┴─────────────┴────────────┴──────────────┘    │ │
    │  └────────────────────────────────────────────────────────────┘ │
    └─────────────────────────────────────────────────────────────────┘
-                              ↓↑
+                                   ↓↑
    ┌─────────────────────────────────────────────────────────────────┐
    │           SHARED MEMORY INTERFACE (mmap + spinlock)             │
    │  - Windows named pipe: "GD_RL_Memory"                           │
@@ -37,25 +37,25 @@ High-Level System Design
    │  - Synchronization: volatile int flags (cpp_writing, py_writing)│
    │  - Latency: <1ms for I/O, spinlock contention minimal           │
    └─────────────────────────────────────────────────────────────────┘
-                              ↓↑
+                                   ↓↑
    ┌─────────────────────────────────────────────────────────────────┐
    │                   C++ GEODE MOD LAYER                           │
    │  (utridu/src/main.cpp)                                          │
    │  ┌────────────────────────────────────────────────────────────┐ │
-   │  │ MyPlayLayer::rl_loop (60 Hz)                              │ │
-   │  │  - State collection & normalization                       │ │
-   │  │  - Object detection & distance computation               │ │
-   │  │  - Reward signal preparation                             │ │
-   │  │  - Action injection (spinlock + transition logic)        │ │
+   │  │ MyPlayLayer::rl_loop (60 Hz)                               │ │
+   │  │  - State collection & normalization                        │ │
+   │  │  - Object detection & distance computation                 │ │
+   │  │  - Reward signal preparation                               │ │
+   │  │  - Action injection (spinlock + transition logic)          │ │
    │  └────────────────────────────────────────────────────────────┘ │
    └─────────────────────────────────────────────────────────────────┘
-                              ↓↑
+                                    ↓↑
    ┌─────────────────────────────────────────────────────────────────┐
    │              GEOMETRY DASH ENGINE (Cocos2D)                     │
    │  - Frame-by-frame physics simulation                            │
    │  - Player state management (velocity, collision detection)      │
    │  - Object management (obstacles, portals, gravity switches)     │
-   │  - Rendering & game loop (60 FPS)                              │
+   │  - Rendering & game loop (60 FPS)                               │
    └─────────────────────────────────────────────────────────────────┘
 
 Python Training Pipeline
@@ -212,7 +212,7 @@ Design notes:
 
 Responsibilities:
 
-- Track curriculum progress across 8 slices
+- Track curriculum progress across 9 slices
 - Determine promotion eligibility
 - Reset statistics between slices
 - Persist progress to JSON for resumption
@@ -467,37 +467,6 @@ Performance Characteristics
    │
    └─ Total: ~3.5-5.5 ms (21-33% of frame budget)
       Leaves 11-13 ms for training on background thread (if implemented)
-
-**GPU Memory Usage**
-
-.. code-block:: text
-
-   PyTorch Tensors:
-   - Online network:  ~520 KB (130K params × 4 bytes)
-   - Target network:  ~520 KB
-   - Batch input (64): ~40 KB (64 × 154 × 4 bytes)
-   - Batch target:    ~2 KB
-   
-   Replay Buffer:
-   - States:  50K × 154 × 4 bytes = 30.8 MB
-   - Actions: 50K × 1 × 4 bytes   = 200 KB
-   - Rewards: 50K × 1 × 4 bytes   = 200 KB
-   - Dones:   50K × 1 × 1 byte    = 50 KB
-   
-   Total: ~31.5 MB (typical GPU has 4-24 GB)
-
-**Training Throughput**
-
-.. code-block:: text
-
-   Samples/sec: 64 (batch) × 60 (frames/sec) ÷ 4 (frame_skip) = 960 samples/sec
-   
-   Gradient steps/sec: 960 ÷ 64 = 15 steps/sec
-   
-   Time to 50K samples: 50000 ÷ 960 ≈ 52 seconds
-   Time to train 1 slice: 100-200 episodes × 300 steps/episode ÷ 960 ≈ 30-60 minutes
-   
-   Total training time (8 slices, 250 episodes avg): ~18-24 hours
 
 Extensibility Points
 --------------------

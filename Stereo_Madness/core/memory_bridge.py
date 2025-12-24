@@ -3,8 +3,8 @@ import ctypes
 import time
 from config import MEM_NAME
 
-# --- C++ STRUCT MAPPING ---
-# Must match the Struct definition in your Geode C++ Mod exactly.
+# C++ STRUCT MAPPING
+# Must match the Struct definition in my Geode C++ Mod (utridu) exactly.
 class ObjectData(ctypes.Structure):
     _fields_ = [
         ("dx", ctypes.c_float),
@@ -44,7 +44,7 @@ class SharedState(ctypes.Structure):
         # Commands
         ("action_command", ctypes.c_int),     # 0=Release, 1=Hold
         ("reset_command", ctypes.c_int),      # 1=Reset Level
-        ("checkpoint_command", ctypes.c_int), # 1=Set Checkpoint (Not used often, we use 'W')
+        ("checkpoint_command", ctypes.c_int), # 1=Set Checkpoint (Not used often, I use 'W'(Practice mod in the game ...))
     ]
 
 class MemoryBridge:
@@ -88,7 +88,7 @@ class MemoryBridge:
         """
         self.state.py_writing = 1
         self.state.reset_command = 1
-        self.state.action_command = 0 # Ensure we don't jump immediately
+        self.state.action_command = 0 # Ensure player doesn't jump immediately
         self.state.py_writing = 0
         time.sleep(0.05) # Give C++ time to process
 

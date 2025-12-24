@@ -427,14 +427,14 @@ Ep 2    | Win% 10.2%  | % 8.3  | Reward -8.12   | Loss 17.768
 | 7 | Ship | - | 70% |
 | 8 | Cube | 2000 | 70% |
 
-**Total Training Time**: ~18-24 hours on single GPU (RTX 3080)
+**Total Training Time**: ~18-24 hours on cpu
 
 ### Key Observations
 
-1. **Mode-Switch Overhead**: Ship slices (4, 7) require ~30% more episodes than same-mode progression due to physics reset
-2. **Precision-Dependent Difficulty**: Slice 3 (Triple Spike) hardest cube section; requires precise jump timing
+1. **Mode-Switch Overhead**: Ship slices (4) require ~30% less episodes than same-mode progression due to physics simplicity 
+2. **Precision-Dependent Difficulty**: Slice 6 (Triple Spike) hardest cube section; requires precise jump timing
 3. **Late-Game Scaling**: Episode step count increases linearly with level completion percentage
-4. **Sample Efficiency**: ~500K total transitions to reach >70% on final slice (competitive with modern RL algorithms)
+4. **Sample Efficiency**: ~ 6M total transitions to reach >70% on final slice
 
 ---
 
@@ -449,14 +449,15 @@ Ep 2    | Win% 10.2%  | % 8.3  | Reward -8.12   | Loss 17.768
 - Network forward pass: ~3-5ms
 - Memory I/O + synchronization: ~8-12ms
 - **Net Effect**: Occasional frame drops during decision-making
-
+- *Result* ==> (Will work fine for the easy-mid-hard levels but for levels of diff > insane it will cause problems (impossible for the case of demons lvls))
+  
 **Mitigation**: Frame stacking (action repeats) and frame skipping reduce effective required latency.
 
 **Future**: Quantization (INT8) and model pruning could reduce inference to <1ms.
 
 #### 2. **Generalization**
 
-**Issue**: Agent trains on Stereo Madness only; architecture not tested on other levels
+**Issue**: Agent trains on Stereo Madness only; architecture not tested on other levels 
 - Level-specific reward shaping may not transfer
 - Object detection calibrated for Stereo Madness patterns
 - Curriculum design requires manual slice definition per level
@@ -477,37 +478,37 @@ Ep 2    | Win% 10.2%  | % 8.3  | Reward -8.12   | Loss 17.768
 #### 4. **Stochasticity Limitations**
 
 **Issue**: Game engine is deterministic; no environmental noise
-- Agent may overfit to precise state-action sequences
+- Agent may overfit to precise state-action sequences 
 - Real-world perturbations (lag spikes, input delays) not modeled
 - No resilience to adversarial conditions
 
-**Future**: Domain randomization (modify object positions, gravity, speeds) to increase robustness.
+**Future**: Domain randomization (modify object positions, gravity, speeds) to increase robustness and expand the observation for the full game objects/mods
 
 #### 5. **Reward Shaping Brittleness**
 
-**Issue**: Hand-tuned expert reward functions require per-mode calibration
+**Issue**: Hand-tuned expert reward functions require per-mode calibration (test and observe Agent behavior ==> adjust)
 - Coefficients (progress_scale, jump_penalty) not learned automatically
-- Suboptimal hyperparameters lead to poor exploration/exploitation trade-off
+- Suboptimal hyperparameters lead to poor exploration/exploitation trade-off 
 
-**Future**: Inverse RL to learn reward function from human demonstrations.
+**Future**: Inverse RL to learn reward function from human demonstrations. (or GAIL)
 
 ### Proposed Extensions
 
 #### 1. **Multi-Level Training**
 
-- Extend framework to other Geometry Dash levels
+- Extend framework to other Geometry Dash levels 
 - Implement automatic curriculum discovery via learning progress metrics
-- Transfer learning across levels with similar physics patterns
+- Transfer learning across levels with similar physics patterns (back on track/Polargeist)
 
 #### 2. **Imitation Learning Bootstrapping**
 
-- Record human playthroughs
+- Record human playthroughs 
 - Pre-train agent via behavioral cloning
 - Fine-tune via RL to exceed human performance
 
 #### 3. **Model Ensemble & Uncertainty**
 
-- Train multiple agents with different random seeds
+- Train multiple agents with different seeds
 - Use ensemble disagreement for exploration confidence
 - Reduces reliance on ε-greedy heuristic
 
@@ -564,7 +565,9 @@ Stereo_Madness/
 For questions, issues, or extensions, consult the source code documentation in individual modules or contact the development team.
 
 **Key References**:
+-Playing Geometry Dash with Convolutional Neural Networks, Stanford University 
 - Van Hasselt et al. (2015): "Deep Reinforcement Learning with Double Q-learning"
 - Wang et al. (2016): "Dueling Network Architectures for Deep Reinforcement Learning"
 - Curriculum Learning: Bengio et al. (2009), Graves et al. (2017)
+
 

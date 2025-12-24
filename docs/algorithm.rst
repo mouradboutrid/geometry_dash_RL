@@ -159,24 +159,30 @@ Why Not A3C?
 
 **Comparison Table**:
 
-+-------------------+-------+-------+
-| Criterion         | A3C   | DDQN  |
-+===================+=======+=======+
-| Sample Efficiency | 80%   | 95%   |
-+-------------------+-------+-------+
-| Wall-Clock Time   | Slower| Faster|
-+-------------------+-------+-------+
-| Memory Footprint  | High  | Low   |
-+-------------------+-------+-------+
-| GPU Utilization   | Moderate | High |
-+-------------------+-------+-------+
-| Convergence       | Stable| Stable|
-+-------------------+-------+-------+
+.. list-table:: Algorithm Comparison
+   :widths: 30 35 35
+   :header-rows: 1
+
+   * - Criterion
+     - A3C
+     - DDQN
+   * - Wall-Clock Time
+     - Faster
+     - Slower
+   * - Memory Footprint
+     - High
+     - Low
+   * - CPU Utilization
+     - High
+     - Mid
+   * - Convergence
+     - Stable
+     - Stable
 
 **Why DDQN wins for this project**:
 
-1. **Single-Agent, Wall-Clock Constrained**: One GPU/agent is efficient; parallel overhead not justified
-2. **Sample Efficiency**: DDQN's off-policy learning and experience replay achieve 95%+ action optimality
+1. **Single-Agent, Wall-Clock Constrained**: One CPU/agent is efficient; parallel overhead not justified
+2. **Sample Efficiency**: DDQN's off-policy learning and experience replay achieve 60%+ action optimality
 3. **Simplicity**: Easier to implement, debug, and analyze
 4. **State-Space Alignment**: Discrete actions suit Q-learning better than policy gradients
 
@@ -190,22 +196,25 @@ Why Not PPO?
 
 **PPO (Proximal Policy Optimization)** uses policy gradients with clipped surrogate loss.
 
-**Comparison Table**:
+.. list-table:: Algorithm Comparison (PPO vs. DDQN)
+   :widths: 30 35 35
+   :header-rows: 1
 
-+------------------------+-------+-------+
-| Criterion              | PPO   | DDQN  |
-+========================+=======+=======+
-| Action Space           | Both  | Discrete+|
-+------------------------+-------+-------+
-| Sample Efficiency      | 85%   | 95%   |
-+------------------------+-------+-------+
-| Hyperparameter Tuning  | High  | Moderate |
-+------------------------+-------+-------+
-| Exploration Control    | Entropy| ε-Greedy |
-+------------------------+-------+-------+
-| Convergence Speed      | Moderate | Fast  |
-+------------------------+-------+-------+
-
+   * - Criterion
+     - PPO
+     - DDQN
+   * - Action Space
+     - Continuous/Discrete
+     - Discrete
+   * - Hyperparameter Tuning
+     - High
+     - Moderate
+   * - Exploration Control
+     - Entropy
+     - ε-Greedy
+   * - Convergence Speed
+     - Moderate
+     - Fast
 **Why DDQN wins**:
 
 1. **Discrete Action Space**: Q-learning naturally suited; PPO's continuous relaxation unnecessary
@@ -230,7 +239,7 @@ Q-learning's use of max operator is more suitable for discrete spaces where clea
 Exploration Strategy: Epsilon-Greedy
 -------------------------------------
 
-We use :math:`\epsilon`-greedy exploration: with probability :math:`\epsilon`, select random action; otherwise select greedy action.
+I use :math:`\epsilon`-greedy exploration: with probability :math:`\epsilon`, select random action; otherwise select greedy action.
 
 **Decay Schedule**:
 
@@ -261,7 +270,7 @@ Epsilon-greedy best balances simplicity and effectiveness for discrete actions.
 Experience Replay
 -----------------
 
-We maintain a circular buffer of transitions: :math:`(s, a, r, s', d) \sim \mathcal{D}`
+I maintain a circular buffer of transitions: :math:`(s, a, r, s', d) \sim \mathcal{D}`
 
 **Benefits**:
 
@@ -304,7 +313,7 @@ The target network :math:`Q(s, a; \theta^-)` stabilizes learning by reducing mov
 
 **Why necessary?**
 
-If we used :math:`\theta` for both selection and evaluation, the target would change during optimization, causing instability.
+If I used :math:`\theta` for both selection and evaluation, the target would change during optimization, causing instability.
 
 **Trade-off**:
 
@@ -380,11 +389,13 @@ Then: Q-values converge to optimal Q^* in expectation.
 Complexity Analysis
 -------------------
 
-**Time Complexity per step**:
+**Computational Complexity (CPU-Optimized)**:
 
-- State collection: O(30) (scan 30 nearby objects)
-- Network forward pass: O(input_dim × hidden × output_dim) = O(154 × 256 × 2) ≈ O(80K) = O(1) practical
-- Gradient computation: O(batch_size × 80K) = O(64 × 80K) ≈ O(5M) operations ≈ 1-3ms GPU
+* **State Collection**: $O(N)$ where $N=30$. Scan-time is negligible on CPU (~0.1ms).
+* **Network Forward Pass**: $O(d_{in} \times d_{hid} \times d_{out}) \approx 8 \times 10^4$ FLOPs. 
+  Executed in ~0.5–1ms on modern CPU (AVX-accelerated).
+* **Gradient Computation**: $O(B \times \text{FLOPs})$ where $B=64$. 
+  $\approx 5 \times 10^6$ operations. Executed in ~15–25ms on CPU.
 
 **Space Complexity**:
 
@@ -427,7 +438,6 @@ References
 
 - Van Hasselt et al. (2015): "Deep Reinforcement Learning with Double Q-learning" - AAAI
 - Wang et al. (2016): "Dueling Network Architectures for Deep Reinforcement Learning" - ICML
-- Mnih et al. (2015): "Human-level control through deep reinforcement learning" - Nature
-- Lin (1993): "Reinforcement Learning for Robots Using Neural Networks" - CMU thesis
+- Playing Geometry Dash with Convolutional Neural Networks, Stanford University
 
 Next: :doc:`../curriculum` for how we handle the multi-phase training problem.

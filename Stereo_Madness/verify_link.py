@@ -3,7 +3,7 @@ import ctypes
 import time
 import keyboard
 
-# STRUCT DEFINITIONS (Must match C++)
+# STRUCT DEFINITIONS (Match C++)
 class ObjectData(ctypes.Structure):
     _fields_ = [
         ("dx", ctypes.c_float),

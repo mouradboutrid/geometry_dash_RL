@@ -6,7 +6,7 @@ Detailed explanation of reward functions for each physics mode.
 Overview
 --------
 
-Dense reward shaping is critical for learning in sparse-reward environments. We design separate reward functions for Cube and Ship modes, each exploiting mode-specific dynamics.
+Dense reward shaping is critical for learning in sparse-reward environments. I design separate reward functions for Cube and Ship modes, each exploiting mode-specific dynamics.
 
 **Core Insight**: Reward signal should guide exploration toward successful policies without over-constraining behavior.
 
@@ -128,7 +128,7 @@ The CubeExpert class provides mode-tailored rewards for Slices 1, 2, 3, 5, 6, 8.
 Ship Mode Expert
 ----------------
 
-For Slices 4, 7 (Ship physics):
+For Slices 4, 9 (Ship physics):
 
 .. code-block:: python
 
@@ -190,40 +190,21 @@ Comparison Example
    ├─ Progress (0% → 5%): +100
    ├─ 10 steps: -0.001
    ├─ 2 jumps: -0.001
-   └─ Total: ~+99.98
+   └─ Total: ~-7 to 10
    
    Ship Reward:
    ├─ Progress (30% → 35%): +50
    ├─ Survival: +0.05
    ├─ Centering (near corridor): +8
    ├─ Low velocity (stable): 0 (no penalty)
-   └─ Total: ~+58.05
+   └─ Total: ~+5558.05 to 8600
    
-   Both positive, but different magnitudes reflect difficulty differences.
+   Different magnitudes reflect difficulty differences.
 
 Reward Shaping Challenges
 --------------------------
 
-**Challenge 1: Scale Imbalance**
-
-Small coefficients (0.0001) vs large (20.0) can cause:
-- Numerical instability (underflow/overflow)
-- Difficult optimization (mixed scales)
-
-**Solution**: Normalize rewards at episode end.
-
-.. code-block:: python
-
-   episode_rewards = [r1, r2, r3, ...]  # Raw rewards
-   mean_reward = mean(episode_rewards)
-   std_reward = std(episode_rewards)
-   
-   normalized_rewards = [
-       (r - mean_reward) / (std_reward + 1e-8)
-       for r in episode_rewards
-   ]
-
-**Challenge 2: Sparse High-Magnitude Rewards**
+**Challenge 1: Sparse High-Magnitude Rewards**
 
 Progress bonus (e.g., +100 for 5% completion) can dominate learning.
 
@@ -237,15 +218,15 @@ Progress bonus (e.g., +100 for 5% completion) can dominate learning.
    
    # NOT: reward += state.percent * 2.0 (absolute progress, biased)
 
-**Challenge 3: Hyperparameter Sensitivity**
+**Challenge 2: Hyperparameter Sensitivity**
 
 Small tuning changes cause large performance swings:
 
 .. code-block:: text
 
-   progress_scale = 15.0: Converges in 50 episodes
-   progress_scale = 20.0: Converges in 45 episodes (optimal)
-   progress_scale = 25.0: Converges in 50 episodes
+   progress_scale = 15.0: Converges in X episodes
+   progress_scale = 20.0: Converges in Y episodes (optimal)
+   progress_scale = 25.0: Converges in Z episodes
    progress_scale = 10.0: Fails (explores inefficiently)
    progress_scale = 50.0: Fails (overestimates progress value)
 

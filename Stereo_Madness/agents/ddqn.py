@@ -13,7 +13,7 @@ class DuelingDQN(nn.Module):
         self.fc1 = nn.Linear(input_dim, 256)
         self.fc2 = nn.Linear(256, 256)
         
-        # --- Value Stream (V) ---
+        # Value Stream (V)
         # Estimates: "How good is this state?" (regardless of action)
         self.value_stream = nn.Sequential(
             nn.Linear(256, 128),
@@ -21,7 +21,7 @@ class DuelingDQN(nn.Module):
             nn.Linear(128, 1)
         )
         
-        # --- Advantage Stream (A) ---
+        # Advantage Stream (A)
         # Estimates: "How much better is Action X than the average action?"
         self.advantage_stream = nn.Sequential(
             nn.Linear(256, 128),
@@ -94,19 +94,19 @@ class Agent:
         reward = torch.FloatTensor(reward).unsqueeze(1).to(self.device)
         done = torch.FloatTensor(done).unsqueeze(1).to(self.device)
 
-        # 1. Current Q(s, a)
+        # Current Q(s, a)
         curr_q = self.online_net(state).gather(1, action)
         
-        # 2. Max Action from Online Net (Double DQN trick)
+        # Max Action from Online Net (Double DQN trick)
         next_actions = self.online_net(next_state).argmax(1, keepdim=True)
         
-        # 3. Q-Value from Target Net using that action
+        # Q-Value from Target Net using that action
         next_q = self.target_net(next_state).gather(1, next_actions)
         
-        # 4. Bellman Equation
+        # Bellman Equation
         target_q = reward + (1 - done) * self.config['gamma'] * next_q
         
-        # 5. Optimize
+        # Optimize
         loss = self.loss_fn(curr_q, target_q.detach())
         
         self.optimizer.zero_grad()

@@ -12,14 +12,14 @@ def visualize_decision_boundary(slice_id=1):
         print("Model not found. Train for at least 50 episodes first!")
         return
 
-    # 1. Load Model
+    # Load Model
     model = DuelingDQN().to(DEVICE)
     checkpoint = torch.load(model_path, map_location=DEVICE)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
 
-    # 2. Create Search Space (Distance to Spike vs vertical Velocity)
-    # We simulate 100x100 different game states
+    # Create Search Space (Distance to Spike vs vertical Velocity)
+    # I simulate 100x100 different game states
     dist_range = np.linspace(0, 500, 100) # 0 to 500 units away
     vel_range = np.linspace(-15, 15, 100)  # -15 to +15 vertical velocity
     
@@ -42,7 +42,7 @@ def visualize_decision_boundary(slice_id=1):
                 probs = torch.softmax(q_values, dim=1)
                 heatmap[j, i] = probs[0, 1].item() # Store probability of Jump
 
-    # 3. Plotting
+    # Plotting
     plt.style.use('dark_background')
     plt.figure(figsize=(10, 8))
     ax = sns.heatmap(heatmap, xticklabels=20, yticklabels=20, cmap="icefire", cbar_kws={'label': 'Jump Probability'})
@@ -59,5 +59,4 @@ def visualize_decision_boundary(slice_id=1):
     plt.tight_layout()
     plt.show()
 
-if __name__ == "__main__":
-    visualize_decision_boundary(slice_id=1)
+visualize_decision_boundary(slice_id=1)

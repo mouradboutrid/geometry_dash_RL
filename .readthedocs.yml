@@ -1,4 +1,3 @@
-# .readthedocs.yml
 version: 2
 
 build:
@@ -6,8 +5,12 @@ build:
   tools:
     python: "3.11"
   jobs:
-    - apt-get update
-    - apt-get install -y some-package
+    apt_update:
+      commands:
+        - sudo apt-get update
+    install_dependencies:
+      commands:
+        - sudo apt-get install -y some-package
 
 python:
   install:

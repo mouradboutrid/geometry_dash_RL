@@ -214,16 +214,16 @@ When advancing from Slice N to Slice N+1 with same physics mode:
 .. code-block:: text
 
    WITHOUT transfer (fresh network each slice):
-   Slice 1: 15 episodes to 70%
-   Slice 2: 25 episodes (must relearn jump mechanics)
-   Slice 3: 50 episodes (triple spike is hard!)
-   Total: 90 episodes
+   Slice 1: 1000 episodes to 70%
+   Slice 2: 6500 episodes (must relearn jump mechanics)
+   Slice 3: 7000 episodes (triple spike is hard!)
+   Total: 14500 episodes (This waste me alot of time !!)
    
    WITH transfer (reuse previous weights):
-   Slice 1: 15 episodes to 70%
-   Slice 2: 18 episodes (weights already know jump; refine spacing)
-   Slice 3: 35 episodes (weights know mechanics; just need precision)
-   Total: 68 episodes → 24% improvement!
+   Slice 1: 1000 episodes to 70%
+   Slice 2: 1300 episodes (weights already know jump; refine spacing)
+   Slice 3: 2000 episodes (weights know mechanics; just need precision)
+   Total  : 4300 episodes → huge improvement!
    
    Mechanism: Shared features (how to jump, timing patterns) generalize
    across slices; only fine-tuning needed for slice-specific challenges
@@ -259,9 +259,9 @@ Relay Race Navigation
 
 **Problem**
 
-When starting training on Slice 5 (47% target), we don't want to:
+When starting training on Slice 5 (47% target), I don't want to:
 1. Train from 0% (wastes time on mastered content)
-2. Manually navigate to 47% every episode (slow; error-prone)
+2. Manually navigate to 47% every episode (slow; error-prone) (This also waste me 15h to only train slice 1 and 2 autopilot)
 
 **Solution: Expert Ensemble Navigation**
 
@@ -414,16 +414,16 @@ Is the progression difficulty balanced?
 
    Episodes to 70% (empirical):
    
-   Slice 1: 8 episodes    ▯▯ (easy intro)
-   Slice 2: 22 episodes   ▯▯▯ (moderate step)
-   Slice 3: 45 episodes   ▯▯▯▯▯▯▯ (triple spike hard!)
-   Slice 4: 38 episodes   ▯▯▯▯▯▯▯ (mode switch; hard)
-   Slice 5: 28 episodes   ▯▯▯▯ (easier; cube again)
-   Slice 6: 35 episodes   ▯▯▯▯▯ (moderate)
-   Slice 7: 42 episodes   ▯▯▯▯▯▯▯ (ship section harder)
-   Slice 8: 52 episodes   ▯▯▯▯▯▯▯▯ (final endurance)
-   
-   Total: 270 episodes ≈ 18-24 hours
+   Slice 1: 1100 episodes   ▯▯ (easy intro)
+   Slice 2: 1300 episodes   ▯▯▯ (moderate step)
+   Slice 3: 2000 episodes   ▯▯▯▯▯▯ (triple spike hard!)
+   Slice 4: 1000 episodes   ▯▯▯▯▯▯▯ (mode switch; hard)
+   Slice 5: 3000 episodes   ▯▯▯▯ (easier; cube again)
+   Slice 6: - episodes      ▯▯▯▯▯ (moderate)
+   Slice 7: - episodes      ▯▯▯▯▯▯ (harder)
+   Slice 8: - episodes      ▯▯▯▯▯▯▯▯ (final endurance)
+   Slice 9: - episodes      ▯▯▯▯▯ (final endurance)
+
 
 Could it improved by reordering slices? Analysis:
 
@@ -450,19 +450,19 @@ Comparison with Fixed-Curriculum Baselines
 .. code-block:: text
 
    Strategy A: No Curriculum (train on full 100% slices)
-   - Total episodes to first 100% completion: Never achieved (>500 episodes)
-   - Success rate: <1%
+   - Total episodes to first 100% completion: Never achieved (>20000 episodes)
+   - Success rate: <1% (Didnt work with (with ppo, dqn, ddqn, A3C, and even Stanford team with cnn didnt solve it until they use imitation learning))
    - Result: FAILURE (sparse reward problem)
    
    Strategy B: Random Curriculum (random slice order)
-   - Total episodes: ~450 (many retries due to poor ordering)
-   - Success rate: 50%
+   - Total episodes: (many retries due to poor ordering)
+   - Success rate: ?% (Random )
    - Result: Works but inefficient
    
-   Strategy C: Our Curriculum (geometric + physics-aware)
-   - Total episodes: ~270
+   Strategy C: My Curriculum (geometric + physics-aware)
+   - Total episodes: ~ X
    - Success rate: 95%+ on all slices
-   - Result: OPTIMAL (24% better than random; 100x better than no curriculum)
+   - Result: OPTIMAL (50% better than random; 100x better than no curriculum)
 
 Troubleshooting
 ---------------

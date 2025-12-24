@@ -4,20 +4,19 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.10"
-  # Common dependencies for RL/GUI projects to prevent build errors
   apt_packages:
     - libgl1-mesa-glx
     - libosmesa6
     - freeglut3-dev
 
 sphinx:
-  configuration: docs/conf.py
+  # Adjust this if your conf.py is also in the root
+  configuration: docs/conf.py 
 
 formats:
   - pdf
 
 python:
   install:
-    - requirements: docs/requirements.txt
-    - method: pip
-      path: .
+    # Pointing to the requirements.txt in your main (root) folder
+    - requirements: requirements.txt

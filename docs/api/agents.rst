@@ -21,47 +21,29 @@ The ``Agent`` class implements Dueling Double Q-Learning with the following key 
 
    :param int input_dim: Input dimension (154 for Geometry Dash)
    :param int output_dim: Output dimension (2 for jump/release)
-   :param dict config: Configuration dict with keys:
-       - device: torch device
-       - lr: learning rate (default 0.0003)
-       - gamma: discount factor (default 0.99)
-       - batch_size: replay batch size (default 64)
-       - target_update: steps between target network sync (default 1000)
-       - epsilon_start: initial exploration rate (default 1.0)
-       - epsilon_end: final exploration rate (default 0.01)
-       - epsilon_decay: exploration decay steps (default 50000)
+   :param dict config: Configuration dict containing hyperparameters
    :param str checkpoint_dir: Directory for saving/loading models
 
-   .. py:method:: select_action(state, is_training=True) -> int
+   .. py:method:: select_action(state, is_training=True)
 
       Select action using epsilon-greedy exploration.
 
       :param ndarray state: Observation vector (154,)
       :param bool is_training: If True, apply epsilon-greedy; else greedy
       :return: Action index (0=Release, 1=Hold)
+      :rtype: int
 
-   .. py:method:: learn(memory) -> float
+   .. py:method:: learn(memory)
 
       Perform one learning step on batch from replay buffer.
 
       :param ReplayBuffer memory: Experience replay buffer
-      :return: MSE loss value (float)
+      :return: MSE loss value
+      :rtype: float
 
    .. py:method:: save(filename="best_model.pth")
-
-      Save network weights to checkpoint.
-
-      :param str filename: Checkpoint filename (saved in checkpoint_dir)
-
    .. py:method:: load(path)
-
-      Load network weights from checkpoint.
-
-      :param str path: Path to checkpoint file
-
    .. py:method:: reset_network()
-
-      Re-initialize networks from scratch (for mode switches).
 
 DuelingDQN Architecture
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -70,13 +52,14 @@ DuelingDQN Architecture
 
    Neural network with dueling architecture (value + advantage streams).
 
-   Architecture:
-   - Input: 154 features
-   - FC1: 154 → 256, ReLU
-   - FC2: 256 → 256, ReLU
-   - Value stream: 256 → 128 → 1
-   - Advantage stream: 256 → 128 → 2
-   - Output: Q(s,a) = V(s) + A(s,a) - mean(A(s,a))
+   **Architecture:**
+   
+   - **Input**: 154 features
+   - **FC1**: 154 → 256, ReLU
+   - **FC2**: 256 → 256, ReLU
+   - **Value stream**: 256 → 128 → 1
+   - **Advantage stream**: 256 → 128 → 2
+   - **Output**: $Q(s,a) = V(s) + A(s,a) - \text{mean}(A(s,a))$
 
 ReplayBuffer
 ------------
@@ -89,32 +72,11 @@ ReplayBuffer
 
    Fixed-size circular buffer for experience replay.
 
-   :param int capacity: Maximum number of transitions (default 50000)
+   :param int capacity: Max transitions (default 50000)
 
    .. py:method:: push(state, action, reward, next_state, done)
-
-      Store transition in buffer.
-
-      :param ndarray state: Current state
-      :param int action: Action taken
-      :param float reward: Reward received
-      :param ndarray next_state: Next state
-      :param bool done: Episode termination flag
-
-   .. py:method:: sample(batch_size) -> tuple
-
-      Sample random batch from buffer.
-
-      :param int batch_size: Size of batch
-      :return: Tuple of (states, actions, rewards, next_states, dones) arrays
-      :rtype: tuple
-
-   .. py:method:: __len__() -> int
-
-      Get current buffer size.
-
-      :return: Number of stored transitions
-      :rtype: int
+   .. py:method:: sample(batch_size)
+   .. py:method:: __len__()
 
 Expert Modules
 --------------
@@ -127,25 +89,15 @@ Expert Modules
 
    Static utility class for cube mode reward shaping.
 
-   .. py:staticmethod:: get_reward(state, action, prev_percent, prev_dist_nearest_hazard=None, reward_context=None) -> float
+   .. py:staticmethod:: get_reward(state, action, prev_percent, prev_dist_nearest_hazard=None, reward_context=None)
 
-      Compute reward for cube mode.
-
-      :param SharedState state: Current game state
-      :param int action: Action taken (0 or 1)
-      :param float prev_percent: Previous progress percentage
-      :param float prev_dist_nearest_hazard: Previous hazard distance (optional)
-      :param dict reward_context: Additional context (optional)
-      :return: Scalar reward
-      :rtype: float
-
-      Reward components:
-      - Progress: Δ% × 20.0 (main signal)
-      - Step penalty: -0.0001
-      - Jump penalty: -0.0005
-      - Spam penalty: -0.001
-      - Clearance bonus: +0.01
-      - Landing bonus: +20
+      **Reward components:**
+      
+      - **Progress**: $\Delta\% \times 20.0$
+      - **Step penalty**: -0.0001
+      - **Jump penalty**: -0.0005
+      - **Clearance bonus**: +0.01
+      - **Landing bonus**: +20
 
 .. automodule:: agents.expert_ship
    :members:
@@ -153,29 +105,37 @@ Expert Modules
 
 .. py:class:: ShipExpert
 
-   Static utility class for ship mode reward shaping.
+   SOTA-aligned reward shaping for Ship mode (Stereo Madness). 
+   Focuses on survival, forward progress, and vertical stability around **Y=235**.
 
-   .. py:staticmethod:: get_reward(state, action, prev_percent) -> float
+   .. py:staticmethod:: get_reward(state, action, prev_percent, prev_dist_nearest_hazard=None, reward_context=None)
 
-      Compute reward for ship mode.
+      Compute reward for ship mode with DDQN-safe clamping.
 
       :param SharedState state: Current game state
-      :param int action: Action taken
+      :param int action: Action taken (0=Release, 1=Thrust)
       :param float prev_percent: Previous progress percentage
-      :return: Scalar reward
+      :param float prev_dist_nearest_hazard: Previous hazard distance (optional)
+      :param dict reward_context: Context containing ``prev_action`` and scales
+      :return: Scalar reward clamped between [-10.0, 10.0]
       :rtype: float
 
-      Reward components:
-      - Progress: Δ% × 10.0
-      - Survival: +0.05
-      - Centering: Based on distance to y=235
-      - Stability: -2000 if |vel_y| > 3.2
-      - Precision: +3 if near hazard
+      **Reward components:**
+      
+      - **Progress (Main)**: $\Delta\% \times 20.0$
+      - **Stability**: Bonus up to +0.01 based on proximity to $Y=235$
+      - **Thrust Penalty**: -0.0003 per thrust action
+      - **Spam Penalty**: -0.0005 if action is a repeated thrust
+      - **Clearance**: +0.005 for moving away from hazards within 30 units
+      - **Death Penalty**: -5.0
+      - **Step Penalty**: -0.0001
+
+   .. py:staticmethod:: should_reset_weights(prev_mode)
+
+      Returns True if switching from Cube (0) to Ship (1).
 
 Configuration
 -------------
-
-Key hyperparameters in ``config.py``:
 
 .. code-block:: python
 
@@ -186,15 +146,7 @@ Key hyperparameters in ``config.py``:
    MEMORY_SIZE = 50000       # Replay buffer capacity
    TARGET_UPDATE = 1000      # Target network sync frequency
 
-   # Exploration
-   EPSILON_START = 1.0       # Initial exploration rate
-   EPSILON_END = 0.01        # Final exploration rate
-   EPSILON_DECAY = 50000     # Decay schedule parameter
-
    # I/O
    INPUT_DIM = 154           # State dimension
    OUTPUT_DIM = 2            # Action dimension
-   MEM_NAME = "GD_RL_Memory" # Shared memory name
-   DEVICE = "cuda"           # torch device
-
-See :doc:`../performance` for tuning guidance.
+   DEVICE = "CPU"           # torch device

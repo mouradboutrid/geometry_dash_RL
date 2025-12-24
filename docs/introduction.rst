@@ -19,7 +19,7 @@ Problem Statement
 Geometry Dash is a notoriously difficult rhythm-platformer where players must time jumps to avoid obstacles with pixel-perfect precision. Training an RL agent to master this game is challenging due to:
 
 1. **Sparse Rewards**: Only the final frame (100% completion) yields reward; intermediate progress provides no learning signal
-2. **Long Horizons**: Stereo Madness requires 200-300 correct sequential actions
+2. **Long Horizons**: Stereo Madness requires 90-150 correct sequential actions
 3. **Non-Stationary Physics**: Cube and Ship modes operate under different gravity and control mechanics
 4. **Real-Time Constraints**: Decisions must be made within 16.67 ms per frame
 5. **High Variance**: Stochastic exploration in such a precise domain easily leads to failure
@@ -32,10 +32,10 @@ Traditional Deep RL Methods Struggle
 - **PPO**: Designed for continuous actions; discrete action spaces benefit from Q-learning
 - **Simple Q-Learning**: State space (2^154 possibilities) is too large for tabular methods
 
-Our Solution
+My Solution
 ^^^^^^^^^^^^
 
-We employ a hierarchical approach combining algorithmic and curriculum innovations:
+I employ a hierarchical approach combining algorithmic and curriculum innovations:
 
 .. mermaid::
 
@@ -75,7 +75,7 @@ Key Innovations
 
 1. **Decoupled Action Selection** (Double DQN)
    
-   Standard DQN uses the same network to select and evaluate actions, leading to overestimation. Our approach:
+   Standard DQN uses the same network to select and evaluate actions, leading to overestimation. My approach:
    
    .. code-block:: python
    
@@ -86,7 +86,7 @@ Key Innovations
 
 2. **Value-Advantage Decomposition** (Dueling Architecture)
    
-   Rather than directly computing Q(s,a), we separately compute:
+   Rather than directly computing Q(s,a), I separately compute:
    - V(s): How good is this state?
    - A(s,a): How much better is this action than average?
    
@@ -96,7 +96,7 @@ Key Innovations
 
 3. **Expertise Specialization**
    
-   Each curriculum slice maintains a specialized expert policy optimized for its local dynamics. When advancing, we transfer weights from the most recent expert with identical physics mode:
+   Each curriculum slice maintains a specialized expert policy optimized for its local dynamics. When advancing, It transfer weights from the most recent expert with identical physics mode:
    
    .. code-block:: python
    
@@ -122,7 +122,7 @@ Upon successful training:
 - **Slice 7**: Agent masters second ship section (68-80%)
 - **Slice 8**: Agent completes final cube sprint (80-100%)
 
-Overall success rate: **70-75%** across random initializations and stochastic training seeds.
+Overall success rate: **70%** across random initializations and stochastic training seeds.
 
 Document Organization
 ---------------------

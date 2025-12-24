@@ -7,7 +7,7 @@ class CurriculumManager:
     def __init__(self):
         # Load the Slice Definitions
         with open(CURRICULUM_FILE, 'r') as f:
-            self.slices = json.load(f)
+            self.slices = json.load(f) 
             
         # Initialize Metrics
         self.slice_idx = 0       # Current index (0 to 8)

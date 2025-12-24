@@ -52,7 +52,6 @@ Development Workflow
 
 Format: ``[CATEGORY] Brief description``
 
-.. code-block:: text
 
 Contribution Areas
 -------------------

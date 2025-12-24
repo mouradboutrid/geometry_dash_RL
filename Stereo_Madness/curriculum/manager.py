@@ -5,21 +5,21 @@ from config import CURRICULUM_FILE, META_FILE, CHECKPOINT_DIR
 
 class CurriculumManager:
     def __init__(self):
-        # 1. Load the Slice Definitions
+        # Load the Slice Definitions
         with open(CURRICULUM_FILE, 'r') as f:
             self.slices = json.load(f)
             
-        # 2. Initialize Metrics
+        # Initialize Metrics
         self.slice_idx = 0       # Current index (0 to 8)
         self.wins_window = []    # Rolling window of last 50 episodes (0=Fail, 1=Success)
         self.total_steps = 0
         self.best_rate_current_slice = 0.0
         
-        # 3. Create Directories
+        # Create Directories
         os.makedirs(CHECKPOINT_DIR, exist_ok=True)
         os.makedirs(os.path.dirname(META_FILE), exist_ok=True)
         
-        # 4. Resume Progress if Meta file exists
+        # Resume Progress if Meta file exists
         if os.path.exists(META_FILE):
             self.load_state()
         else:
@@ -55,7 +55,7 @@ class CurriculumManager:
     def should_promote(self):
         """
         The Gatekeeper: Returns True if agent has mastered the slice.
-        Criteria: At least 20 episodes played AND >70% win rate.
+        Criteria: At least 20 episodes played AND >70% win rate. (Faster training .... :))
         """
         if len(self.wins_window) < 20: 
             return False 

@@ -4,13 +4,10 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
-  jobs:
-    apt_update:
-      commands:
-        - sudo apt-get update
-    install_dependencies:
-      commands:
-        - sudo apt-get install -y some-package
+  post_system_dependencies:
+    commands:
+      - sudo apt-get update
+      - sudo apt-get install -y some-package
 
 python:
   install:

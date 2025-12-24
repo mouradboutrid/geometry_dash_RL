@@ -574,8 +574,9 @@ Stereo_Madness/
  **For questions, issues, or extensions, consult the source code documentation or contact me**
  
 **Mourad Boutrid**  
-📧 Email: [your.email@example.com](muurad.boutrid@gmail.com)  
-🔗 LinkedIn: [linkedin.com/in/yourname]([https://www.linkedin.com/in/yourname](https://ma.linkedin.com/in/mourad-boutrid-981659336))
+📧 Email: [muurad.boutrid@gmail.com](mailto:your.email@example.com)  
+🔗 LinkedIn: [https://ma.linkedin.com/in/mourad-boutrid-981659336](https://www.linkedin.com/in/yourname)
+
 
 
 

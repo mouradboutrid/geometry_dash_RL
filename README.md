@@ -560,14 +560,21 @@ Stereo_Madness/
 
 ---
 
-## Contributing & Contact
-
-For questions, issues, or extensions, consult the source code documentation in individual modules or contact the development team.
+## Contributing 
 
 **Key References**:
 -Playing Geometry Dash with Convolutional Neural Networks, Stanford University 
 - Van Hasselt et al. (2015): "Deep Reinforcement Learning with Double Q-learning"
 - Wang et al. (2016): "Dueling Network Architectures for Deep Reinforcement Learning"
 - Curriculum Learning: Bengio et al. (2009), Graves et al. (2017)
+
+ For questions, issues, or extensions, consult the source code documentation or contact me
+
+ ## Author
+ 
+**Mourad Boutrid**  
+[![Email](https://img.shields.io/badge/Email-D14836?logo=gmail&logoColor=white)](muurad.boutrid@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin&logoColor=white)]([https://www.linkedin.com/in/yourname](https://ma.linkedin.com/in/mourad-boutrid-981659336))
+
 
 

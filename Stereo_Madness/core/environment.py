@@ -99,14 +99,14 @@ class GeometryDashEnv(gym.Env):
     def _calculate_reward(self, state, action, is_dead, reward_context=None):
         reward_context = reward_context or {}
 
-        # --- 0. Terminal State Rewards ---
+        # Terminal State Rewards 
         if is_dead:
             # Use dynamic death penalty from context if available, otherwise default
             return reward_context.get("death_penalty", -100.0)
         if self.current_slice and state.percent >= self.current_slice['end']:
             return 1000.0  # Jackpot for finishing the slice
         
-        # --- 1. Mode-specific expert reward ---
+        # Mode-specific expert reward
         if state.player_mode == 0:  # Cube
             reward = CubeExpert.get_reward(
                 state,

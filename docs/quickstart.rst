@@ -39,11 +39,11 @@ The training loop outputs metrics every episode:
 
 .. code-block:: text
 
-   Ep 1    | Win% 5.1%   | % 12.5  | Reward 45.23  | Loss 0.0234
-   Ep 2    | Win% 10.2%  | % 18.3  | Reward 38.12  | Loss 0.0189
-   Ep 3    | Win% 8.7%   | % 14.2  | Reward 32.45  | Loss 0.0156
+   Ep 1    | Win% -%     | % -  | Reward -  | Loss -
+   Ep 2    | Win% -%     | % -  | Reward -  | Loss -
+   Ep 3    | Win% -%     | % -  | Reward -  | Loss -
    ...
-   Ep 25   | Win% 75.0%  | % 10.0  | Reward 28.91  | Loss 0.0089
+   Ep X    | Win% 70.0%  | % 10.3 | Reward 1100  | Loss 8.9
    [Curriculum] Promoted to Slice 2: Pre-Triple Spike
 
 **Metrics explained:**
@@ -55,11 +55,11 @@ The training loop outputs metrics every episode:
 
 **Expected timeline:**
 
-- Slice 1: 8-15 episodes to 70% success
-- Slice 2-3: 20-50 episodes each
-- Slice 4 (ship mode): 30-50 episodes (physics reset)
-- Slice 5-8: 20-50 episodes each
-- **Total**: 18-24 hours on RTX 3080
+- Slice 1: 800, 1000 episodes to 70% success
+- Slice 2-3: 1000, 6000 episodes each
+- Slice 4 (ship mode): 1000 episodes (physics reset)
+- Slice 5-8: - episodes each
+- **Total**: 24-30 hours on CPU (i5)
 
 Check Checkpoints
 -----------------
@@ -133,7 +133,7 @@ Logs are saved to ``logs/`` directory:
 
    # JSON with progress checkpoint
    logs/training_meta.json
-   # {"slice_idx": 2, "total_steps": 150000}
+   # {"slice_idx": 2, "total_steps": 6000000}
 
 Plot Results
 ^^^^^^^^^^^^
@@ -236,7 +236,7 @@ Edit ``config.py`` to tune training:
    LR = 0.00015           # Lower learning rate
    TARGET_UPDATE = 2000   # Sync target net less often
 
-**Aggressive training** (faster, less stable)
+**Aggressive training** (faster, less stable, I did not test it !)
 
 .. code-block:: python
 
@@ -298,23 +298,22 @@ Common Customizations
 Next Steps
 ----------
 
-- ✅ **Training started?** Monitor progress via log files
-- 🔍 **Want to understand the algorithm?** Read :doc:`../algorithm`
-- 🏗️ **Curious about architecture?** See :doc:`../architecture`
-- 📊 **Analyzing performance?** Check :doc:`../performance`
-- 🐛 **Troubleshooting issues?** See :doc:`../installation` troubleshooting section
-- 🚀 **Extending the project?** Review :doc:`../contributing`
+-  **Training started?** Monitor progress via log files
+-  **Want to understand the algorithm?** Read :doc:`../algorithm`
+-  **Curious about architecture?** See :doc:`../architecture`
+-  **Analyzing performance?** Check :doc:`../performance`
+-  **Troubleshooting issues?** See :doc:`../installation` troubleshooting section
+-  **Extending the project?** Review :doc:`../contributing`
 
 Common Questions
 ----------------
 
 **Q: Can I run this on CPU?**
 
-A: Yes, but ~50x slower. Set ``DEVICE = torch.device("cpu")`` in config.py.
-
+A: Yes, That exactly why i use GEODE/Shared Memory instead of CNN 
 **Q: How long until the agent completes the level?**
 
-A: 18-24 hours of wall-clock training time on GPU. Agent reaches 70%+ success on final slice after 16-20 hours.
+A: 24-30 hours of wall-clock training time on CPU. (less for succes rate < 70% but sacrifice precesion)
 
 **Q: What if I stop training mid-slice?**
 
@@ -322,7 +321,7 @@ A: Progress automatically saves. Just run ``python main.py`` again to resume.
 
 **Q: Can I train multiple agents in parallel?**
 
-A: Not yet (would require separate shared memory regions per agent). Future extension planned.
+A: No (would require separate shared memory regions per agent). Future extension planned.
 
 **Q: How do I evaluate on other levels?**
 

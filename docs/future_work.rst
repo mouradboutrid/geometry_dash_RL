@@ -1,9 +1,9 @@
-Future Work & Research Directions
+Future Work & Research
 ==================================
 
-Planned extensions and open research questions.
+Planned extensions and open questions.
 
-Near-Term (3-6 months)
+Near-Term 
 ----------------------
 
 **1. Model Compression & Optimization**
@@ -56,10 +56,8 @@ Auto-save progress more frequently.
 
 **Benefits**:
 - Recovery granularity: 1 episode instead of 50
-- <5 min data loss instead of 40 min
+- NO loss
 - Enables experimentation with training interrupts
-
-**Timeline**: 1 week implementation
 
 **3. Multi-Level Infrastructure**
 

@@ -24,11 +24,11 @@ struct ObjectData {
 };
 
 struct SharedState {
-    // --- SYNCHRONIZATION ---
+    // SYNCHRONIZATION
     volatile int cpp_writing;    // 1 when C++ is writing
     volatile int py_writing;     // 1 when Python is reading
 
-    // --- PLAYER STATE ---
+    // PLAYER STATE 
     float player_x;
     float player_y;
     float player_vel_x;          // Real calculated velocity (delta x / dt)
@@ -39,17 +39,17 @@ struct SharedState {
     int is_dead;                 // Changed from bool to int for alignment
     int is_terminal;             // Changed from bool to int for alignment
 
-    // --- REWARD SHAPING DATA ---
+    // REWARD SHAPING DATA
     float percent;
     float dist_nearest_hazard;   // NEW: Distance to closest spike
     float dist_nearest_solid;    // NEW: Distance to closest block
     int player_mode;
     float player_speed;          // Internal speed setting
 
-    // --- ENVIRONMENT ---
+    // ENVIRONMENT
     ObjectData objects[MAX_OBJECTS];
 
-    // --- COMMANDS ---
+    // COMMANDS
     int action_command;
     int reset_command;
     int checkpoint_command;
@@ -67,13 +67,13 @@ class $modify(MyPlayLayer, PlayLayer) {
         bool m_isHolding = false;
         bool m_showDebug = true; 
         
-        // NEW: Physics & Death Logic Fields
+        // Physics & Death Logic Fields
         float m_lastX = 0.0f;
         float m_lastPercent = 0.0f;
         int m_stuckFrames = 0;
     };
 
-    // --- HELPER: GET CATEGORY STRING ---
+    // HELPER: GET CATEGORY STRING 
     static std::string getObjectCategory(GameObject* go) {
         if (!go) return "unknown";
         int id = go->m_objectID;
@@ -93,7 +93,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         return "decoration";
     }
 
-    // --- HELPER: MAP CATEGORY TO INT ---
+    // HELPER: MAP CATEGORY TO INT
     int categoryToInt(const std::string& cat) {
         if (cat == "spike") return 1;
         if (cat == "solid_block") return 2;
@@ -110,12 +110,12 @@ class $modify(MyPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
 
-        // --- DISABLE AUTO-CHECKPOINTS ---
+        // DISABLE AUTO-CHECKPOINTS
         GameManager::sharedState()->setGameVariable("0027", false);
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        // 1. SETUP SHARED MEMORY
+        // SETUP SHARED MEMORY
         hMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(SharedState), MEM_NAME);
 
         std::string statusMsg = "RL: Memory Ready (Press M to Toggle HUD)";
@@ -127,13 +127,13 @@ class $modify(MyPlayLayer, PlayLayer) {
             else memset(pSharedMem, 0, sizeof(SharedState));
         }
 
-        // 2. SETUP DRAW NODE
+        // SETUP DRAW NODE
         auto drawNode = CCDrawNode::create();
         drawNode->setZOrder(99999);
         this->m_objectLayer->addChild(drawNode);
         m_fields->m_debugDrawNode = drawNode;
 
-        // 3. SETUP HUD
+        // SETUP HUD
         auto label = CCLabelTTF::create(statusMsg.c_str(), "Courier New", 24.0f);
         label->setScale(0.35f);
         label->setAnchorPoint({0.0f, 1.0f});
@@ -160,7 +160,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         return true;
     }
 
-    // --- INPUT HOOK ---
+    // INPUT HOOK
     void keyDown(enumKeyCodes key) {
         if (key == enumKeyCodes::KEY_M) {
             m_fields->m_showDebug = !m_fields->m_showDebug;
@@ -177,7 +177,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         
         if (m_fields->m_debugDrawNode) m_fields->m_debugDrawNode->clear();
 
-        // --- HANDLE COMMANDS ---
+        // HANDLE COMMANDS 
         if (pSharedMem->reset_command == 1) {
             pSharedMem->reset_command = 0; 
             m_fields->m_stuckFrames = 0;
@@ -197,8 +197,8 @@ class $modify(MyPlayLayer, PlayLayer) {
                 m_fields->m_statusLabel->setColor({0, 255, 0});
         }
 
-        // --- SPINLOCK: WAIT FOR PYTHON TO FINISH WRITING ---
-        // py_writing = 1 means Python is actively writing, so we wait for it to become 0
+        // SPINLOCK: WAIT FOR PYTHON TO FINISH WRITING 
+        // py_writing = 1 means Python is actively writing, so wait for it to become 0
         int safety = 0;
         while (pSharedMem->py_writing == 1 && safety < 5000) {
             safety++; // Prevent infinite loop
@@ -210,14 +210,14 @@ class $modify(MyPlayLayer, PlayLayer) {
         CCPoint pPos = m_player1->getPosition();
         CCRect pRect = m_player1->getObjectRect();
 
-        // --- NEW: CALCULATE REAL VELOCITY ---
+        // CALCULATE REAL VELOCITY
         float real_vel_x = 0.0f;
         if (dt > 0.0001f) {
             real_vel_x = (pPos.x - m_fields->m_lastX) / dt;
         }
         m_fields->m_lastX = pPos.x;
 
-        // --- NEW: STUCK / DEATH DETECTION ---
+        // STUCK / DEATH DETECTION
         bool engineDead = m_player1->m_isDead;
         float currentPct = 0.0f;
         if (this->m_levelLength > 0) currentPct = (pPos.x / this->m_levelLength) * 100.0f;
@@ -234,12 +234,12 @@ class $modify(MyPlayLayer, PlayLayer) {
         bool effectiveDead = engineDead || isStuckDead;
         bool levelComplete = (currentPct >= 100.0f);
 
-        // --- VEHICLE MODE LOGIC ---
+        // VEHICLE MODE LOGIC
         std::string modeVal = "cube";
         int modeInt = 0;
         if (m_player1->m_isShip) { modeVal = "ship"; modeInt = 1; } 
         
-        // --- FILL MEMORY ---
+        // FILL MEMORY
         pSharedMem->player_x = pPos.x;
         pSharedMem->player_y = m_player1->getPositionY();
         pSharedMem->player_vel_x = real_vel_x; // Using real velocity
@@ -253,7 +253,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         pSharedMem->player_mode = modeInt;
         pSharedMem->player_speed = m_player1->m_playerSpeed;
 
-        // --- SCAN OBJECTS & CALCULATE REWARD DISTANCES ---
+        // SCAN OBJECTS & CALCULATE REWARD DISTANCES
         std::vector<RLObject> nearbyObjects;
         float nearestHazard = 9999.0f;
         float nearestSolid = 9999.0f;
@@ -272,7 +272,7 @@ class $modify(MyPlayLayer, PlayLayer) {
             std::string cat = getObjectCategory(go);
             if (cat == "decoration" || cat == "unknown") continue;
 
-            // --- REWARD SHAPING: Find nearest distances ---
+            // REWARD SHAPING: Find nearest distances
             if (dx > 0) { // Only objects in front
                 if (cat == "spike" && dx < nearestHazard) nearestHazard = dx;
                 if (cat == "solid_block" && dx < nearestSolid) nearestSolid = dx;
@@ -296,7 +296,7 @@ class $modify(MyPlayLayer, PlayLayer) {
             return a.dx < b.dx;
         });
 
-        // --- WRITE OBJECTS TO MEMORY (WITH PADDING) ---
+        // WRITE OBJECTS TO MEMORY (WITH PADDING)
         for(int i=0; i<MAX_OBJECTS; i++) {
             if (i < nearbyObjects.size()) {
                 pSharedMem->objects[i].dx = nearbyObjects[i].dx;
@@ -316,7 +316,7 @@ class $modify(MyPlayLayer, PlayLayer) {
 
         pSharedMem->cpp_writing = 0; // UNLOCK
 
-        // --- VISUALIZATION (PRESERVED) ---
+        // VISUALIZATION (PRESERVED)
         if (m_fields->m_showDebug) {
             if (m_fields->m_statusLabel) {
                 std::ostringstream vis;
@@ -351,14 +351,14 @@ class $modify(MyPlayLayer, PlayLayer) {
                 m_fields->m_statusLabel->setString(vis.str().c_str());
 
                 if(m_fields->m_debugDrawNode) {
-                    // 1. Draw Player Bounding Box
+                    // Draw Player Bounding Box
                     CCPoint pPoints[] = {
                         ccp(pRect.getMinX(), pRect.getMinY()), ccp(pRect.getMaxX(), pRect.getMinY()),
                         ccp(pRect.getMaxX(), pRect.getMaxY()), ccp(pRect.getMinX(), pRect.getMaxY())
                     };
                     m_fields->m_debugDrawNode->drawPolygon(pPoints, 4, {0,0,0,0}, 1, {1,1,1,1});
 
-                    // 2. DRAW ALL VISIBLE OBJECTS
+                    // DRAW ALL VISIBLE OBJECTS
                     CCObject* debugObj = nullptr;
                     CCARRAY_FOREACH(m_objects, debugObj) {
                         auto go = typeinfo_cast<GameObject*>(debugObj);
@@ -382,7 +382,7 @@ class $modify(MyPlayLayer, PlayLayer) {
                         m_fields->m_debugDrawNode->drawPolygon(v, 4, {0,0,0,0}, 1.0f, border);
                     }
 
-                    // 3. DRAW RL Objects Overlay
+                    // DRAW RL Objects Overlay
                     for (size_t i = 0; i < nearbyObjects.size(); ++i) {
                         if (i >= MAX_OBJECTS) break;
                         auto& o = nearbyObjects[i];
@@ -397,9 +397,9 @@ class $modify(MyPlayLayer, PlayLayer) {
             }
         } // END m_showDebug check
 
-        // --- APPLY ACTION ---
+        // APPLY ACTION
         // The action_command represents the desired button state (0=released, 1=pressed)
-        // We need to track transitions to trigger pushButton/releaseButton only when state changes
+        // I need to track transitions to trigger pushButton/releaseButton only when state changes
         int cmd = pSharedMem->action_command;
         
         // DEBUG: Log action reads (first 5 times only)

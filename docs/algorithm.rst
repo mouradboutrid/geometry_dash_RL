@@ -402,7 +402,7 @@ Complexity Analysis
 - Online network: ~130K parameters × 4 bytes/float = 520KB
 - Target network: ~130K parameters = 520KB
 - Replay buffer: 50K × 154 × 8 bytes ≈ 62MB
-- **Total**: ~63.5MB (negligible compared to GPU VRAM)
+- **Total**: ~63.5MB 
 
 Practical Tuning Guidelines
 ---------------------------

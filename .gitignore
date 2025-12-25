@@ -46,15 +46,6 @@ venv.bak/
 .pydevproject
 .settings/
 
-# PyTorch & ML
-*.pth
-*.pt
-*.ckpt
-checkpoint/
-checkpoints/
-*.tar
-*.tar.gz
-
 # Logs & Metrics
 logs/
 *.log

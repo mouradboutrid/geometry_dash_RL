@@ -1,5 +1,8 @@
 [![Documentation](https://img.shields.io/badge/Docs-Read%20the%20Docs-brightgreen)](https://geometry-dash-rl.readthedocs.io/en/latest/)
 
+<div align="center">
+  <img src="geode/mods/utridu/logo.png" alt="Geometry Dash RL Logo" width="200">
+</div>
 
 # Geometry Dash Reinforcement Learning Agent
 

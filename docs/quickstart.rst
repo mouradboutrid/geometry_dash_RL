@@ -325,4 +325,4 @@ A: No (would require separate shared memory regions per agent). Future extension
 
 **Q: How do I evaluate on other levels?**
 
-A: Requires manual slice definition and expert reward shaping. See :doc:`../future_work`.
+A: Requires manual slice definition and expert reward shaping. 

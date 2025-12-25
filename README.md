@@ -72,7 +72,7 @@ Geometry Dash presents unique challenges for reinforcement learning:
          │  - State Collection           │
          │  - Action Injection           │
          │  - Physics Synchronization    │
-         └──────┬──────────────────────┘
+         └──────┬────────────────────────┘
                 │
          ┌──────▼──────────────────────┐
          │  Geometry Dash Engine       │

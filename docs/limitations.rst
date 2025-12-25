@@ -385,5 +385,3 @@ Not portable. Limits use to Windows systems with access to specific GD version.
    - Maintains compatibility as GD updates
 
 **Current Scope: Windows 10/11 + GD 2.2074 only.**
-
-Next: :doc:`../future_work` for planned improvements.

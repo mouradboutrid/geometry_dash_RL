@@ -564,7 +564,8 @@ Stereo_Madness/
 │   ├── manager.py                 # Progression & slice management
 │   └── slice_definitions.json     # Level decomposition
 ├── analytics/
-│   ├── dashboard.py               # Training visualization
+│   ├── plots/slice_X/            # training plots
+│   ├── dashboard.py              # Training visualization
 │   ├── plot_heatmap.py           # Performance heatmaps
 │   └── plot_death_map.py         # Failure point analysis
 ├── checkpoints/

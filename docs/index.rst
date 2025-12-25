@@ -131,7 +131,7 @@ Performance Highlights
      - 75%+ action optimality
    * - Training
      - Time to Completion
-     - 24-30 hours (CPU Intel i5)
+     - 18-24 hours (CPU Intel i5)
    * - Inference
      - Network Latency
      - 3-5 ms per decision

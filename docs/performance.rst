@@ -32,7 +32,7 @@ Training Results Summary
 
 **Key Metrics**
 
-- **Total Training Time**: 24,30 hours wall-clock
+- **Total Training Time**: 18, 24 hours wall-clock
 - **Total Samples**: ~81,000 transitions (270 eps × 300 steps avg)
 - **Final Success Rate**: 70% (can complete entire level without failure)
 - **Failure Points**: Random (dies at different locations across runs (Prevent that by increasing Sucsess rate but slow Convergence ...))

@@ -58,7 +58,7 @@ The training loop outputs metrics every episode:
 - Slice 1: 800, 1100 episodes to 70% success
 - Slice 2-3: 1000, 6000 episodes each
 - Slice 4 (ship mode): 490 episodes (physics reset)
-- Slice 5-8: - episodes each
+- Slice 5-8: 9200 episodes for all
 - **Total**: 18-24 hours on CPU (i5)
 
 Check Checkpoints

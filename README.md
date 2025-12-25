@@ -423,6 +423,14 @@ Ep 2    | Win% 10.2%  | % 8.3  | Reward -8.12   | Loss 17.768
 
 ## Results & Performance
 
+### Stereo Madness Demo
+
+![Gameplay Preview](Stereo_Madness/Demo/demo_preview.gif)
+
+**Full video demo**: [Watch on Google Drive](https://drive.google.com/drive/u/0/folders/16WQ3BxmHKJt1DrVuK0n1BKxpC9bzMUin)
+
+---
+
 ### Benchmark Metrics
 
 | Slice | Physics | Episodes to 70% | Peak Success Rate | 

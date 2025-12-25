@@ -432,7 +432,7 @@ Ep 2    | Win% 10.2%  | % 8.3  | Reward -8.12   | Loss 17.768
 | 3 | Cube | 3400 | 70% |
 | 4 | Ship | 487  | 70% |
 | 5, 6, 7, 8 | Cube | 9200 | 70% |
-| 9 | ship | 2000 | 70% |
+| 9 | ship | 650 | 70% |
 
 **Total Training Time**: ~18-24 hours on cpu
 

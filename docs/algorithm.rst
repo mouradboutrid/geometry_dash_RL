@@ -389,13 +389,16 @@ Then: Q-values converge to optimal Q^* in expectation.
 Complexity Analysis
 -------------------
 
-**Computational Complexity (CPU-Optimized)**:
+**Computational Complexity**:
 
-* **State Collection**: $O(N)$ where $N=30$. Scan-time is negligible on CPU (~0.1ms).
-* **Network Forward Pass**: $O(d_{in} \times d_{hid} \times d_{out}) \approx 8 \times 10^4$ FLOPs. 
-  Executed in ~0.5–1ms on modern CPU (AVX-accelerated).
-* **Gradient Computation**: $O(B \times \text{FLOPs})$ where $B=64$. 
-  $\approx 5 \times 10^6$ operations. Executed in ~15–25ms on CPU.
+* **State Collection**: O(N) where N=30
+  - Scan-time is negligible on CPU (~0.1 ms)
+* **Network Forward Pass**: O(d_in × d_hid × d_out) ≈ 8 × 10^4 FLOPs
+  - Executed in ~0.5–1 ms on modern CPU (AVX-accelerated)
+* **Gradient Computation**: O(B × FLOPs) where B=64
+  - ≈ 5 × 10^6 operations
+  - Executed in ~15–25 ms on CPU
+
 
 **Space Complexity**:
 

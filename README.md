@@ -183,21 +183,23 @@ For each of 30 nearest objects:
 
 **Cube Mode Expert** (Slices 1-3, 5-8):
 ```python
-progress_reward = (percent_delta) × 20.0
+progress_reward = max(0.0, percent_delta) * 20.0
 step_penalty = -0.0001
-jump_penalty = -0.0005
-spam_jump_penalty = -0.001 (applied if prev_action was also jump)
-clearance_bonus = +0.01 (for hazard avoidance)
-landing_bonus = +20 (for strategic block jumps)
-hazard_cleaning_reward = min(10 + (count × 10), 50)
+thrust_penalty = -0.0003 if action != 0 else 0.0
+spam_thrust_penalty = -0.0005 if (action != 0 and prev_action == 1) else 0.0
+vertical_stability_bonus = 0.01 * max(0.0, 1.0 - abs(dy_center) / 80.0)
+clearance_bonus = 0.005 if (prev_dist_nearest_hazard is not None and dist_nearest_hazard > prev_dist_nearest_hazard and prev_dist_nearest_hazard < 30.0) else 0.0
+death_penalty = -5.0 if dead else 0.0
+reward = max(min(progress_reward + step_penalty + thrust_penalty + spam_thrust_penalty + vertical_stability_bonus + clearance_bonus + death_penalty, 10.0), -10.0)
+
 ```
 
 **Ship Mode Expert** (Slices 4, 9):
 ```python
-progress_reward = (percent_delta) × 10.0
-survival_reward = +0.05
-centerline_bonus = +10 × (1 - |y - target_y| / 50.0) if within corridor
-instability_penalty = -2000 (if |vel_y| > 3.2)
+progress_reward = (percent_delta) × 20.0
+thrust_penalty = 0003
+step_penalty = -0.0001
+vertical_stability_bonus = 0.01* max(0.0, 1.0 - abs(dy_center)\80.0) ...
 ```
 
 **Design Rationale**: 

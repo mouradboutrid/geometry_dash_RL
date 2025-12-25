@@ -318,11 +318,11 @@ Slice 8: 86-100%   | ship     | Final Ship - Victory Lap
 ### Progression Criteria
 
 **Promotion Requirement**:
-- Minimum 700 episodes completed on current slice
+- Minimum 700 episodes completed on current slice (400 for the ship's slice)
 - Success rate ≥ 70% over last 50 episodes
 
 **Rationale**: 
-- 700-episode minimum ensures statistical significance
+- 700(400)-episode minimum ensures statistical significance
 - 70% threshold balances mastery (agent can handle most patterns) vs. exploration (continues learning corner cases)
 
 ### Policy Transfer Mechanism

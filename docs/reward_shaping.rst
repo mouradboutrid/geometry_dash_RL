@@ -300,7 +300,6 @@ Train auxiliary heads to predict auxiliary signals:
 - Self-supervised learning
 - Better transfer across levels
 
-**Timeline**: 4-6 months (significant architectural change)
 
 Practical Tuning Guide
 ----------------------

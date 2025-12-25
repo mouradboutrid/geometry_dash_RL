@@ -425,7 +425,9 @@ Ep 2    | Win% 10.2%  | % 8.3  | Reward -8.12   | Loss 17.768
 
 ### Stereo Madness Demo
 
-<iframe src="https://drive.google.com/file/d/16ib7Ve6rofQ8ku5codAAaJHP7_f36NQR/preview" width="100%" height="600" allow="autoplay"></iframe>
+[![Watch Demo Video](Stereo_Madness/Demo/demo_preview.gif)](https://drive.google.com/file/d/16ib7Ve6rofQ8ku5codAAaJHP7_f36NQR/view?usp=drive_link)
+
+**Click the image above or [watch full demo video](https://drive.google.com/file/d/16ib7Ve6rofQ8ku5codAAaJHP7_f36NQR/view?usp=drive_link)**
 
 ---
 

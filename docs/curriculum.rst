@@ -414,15 +414,15 @@ Is the progression difficulty balanced?
 
    Episodes to 70% (empirical):
    
-   Slice 1: 1100 episodes   ▯▯ (easy intro)
-   Slice 2: 1300 episodes   ▯▯▯ (moderate step)
-   Slice 3: 2000 episodes   ▯▯▯▯▯▯ (triple spike hard!)
-   Slice 4: 1000 episodes   ▯▯▯▯▯▯▯ (mode switch; hard)
-   Slice 5: 3000 episodes   ▯▯▯▯ (easier; cube again)
-   Slice 6: - episodes      ▯▯▯▯▯ (moderate)
-   Slice 7: - episodes      ▯▯▯▯▯▯ (harder)
-   Slice 8: - episodes      ▯▯▯▯▯▯▯▯ (final endurance)
-   Slice 9: - episodes      ▯▯▯▯▯ (final endurance)
+   Slice 1: 1100 episodes                     ▯▯ (easy intro)
+   Slice 2: 1300 episodes                     ▯▯▯ (moderate step)
+   Slice 3: 3400 episodes                     ▯▯▯▯▯▯ (triple spike hard!)
+   Slice 4: 487 episodes                      ▯▯▯▯▯▯▯ (mode switch; hard)
+   Slice 5: - episodes                        ▯▯▯▯ (easier; cube again)
+   Slice 6: - episodes                        ▯▯▯▯▯ (moderate)
+   Slice 7: - episodes                        ▯▯▯▯▯▯ (harder)
+   Slice 8: Total 9200 episodes(5, 6, 7, 8)   ▯▯▯▯▯▯▯▯ (final endurance)
+   Slice 9: - episodes                        ▯▯▯▯▯ (final endurance)
 
 
 Could it improved by reordering slices? Analysis:

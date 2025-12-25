@@ -222,8 +222,8 @@ When advancing from Slice N to Slice N+1 with same physics mode:
    WITH transfer (reuse previous weights):
    Slice 1: 1000 episodes to 70%
    Slice 2: 1300 episodes (weights already know jump; refine spacing)
-   Slice 3: 2000 episodes (weights know mechanics; just need precision)
-   Total  : 4300 episodes → huge improvement!
+   Slice 3: 3400 episodes (weights know mechanics; just need precision)
+   Total  : 5700 episodes → huge improvement!
    
    Mechanism: Shared features (how to jump, timing patterns) generalize
    across slices; only fine-tuning needed for slice-specific challenges
@@ -260,8 +260,8 @@ Relay Race Navigation
 **Problem**
 
 When starting training on Slice 5 (47% target), I don't want to:
-1. Train from 0% (wastes time on mastered content)
-2. Manually navigate to 47% every episode (slow; error-prone) (This also waste me 15h to only train slice 1 and 2 autopilot)
+*1. Train from 0% (wastes time on mastered content)
+*2. Manually navigate to 47% every episode (slow; error-prone) (This also waste me 15h to only train slice 1 and 2 autopilot)
 
 **Solution: Expert Ensemble Navigation**
 

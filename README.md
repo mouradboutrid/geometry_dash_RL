@@ -428,7 +428,7 @@ Ep 2    | Win% 10.2%  | % 8.3  | Reward -8.12   | Loss 17.768
 ## Results & Performance
 
 ### Stereo Madness Demo
-![Geometry Dash AI Demo](https://drive.google.com/uc?export=view&id=1kjNgjtemtROzXG5oB39mgRszl8-YhJ33)
+![Geometry Dash AI Demo](Demo/demo.gif)
 [![Watch Demo Video](Stereo_Madness/Demo/demo_preview.gif)](https://drive.google.com/file/d/16ib7Ve6rofQ8ku5codAAaJHP7_f36NQR/view?usp=drive_link)
 
 **Click the image above or [watch full demo video](https://drive.google.com/file/d/16ib7Ve6rofQ8ku5codAAaJHP7_f36NQR/view?usp=drive_link)**
